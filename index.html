@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>מסע הגאולה</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Rubik:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one journey column floating over a fixed Jerusalem skyline; the sky moves from night to dawn as gates open, parchment panels carry the learning */
+:root{
+  color-scheme:dark;
+  --night:#0b1330; --night-2:#18244f; --night-3:#24306a;
+  --gold:#e3ad3f; --gold-hi:#ffe2a0; --gold-dk:#8f6214;
+  --stone:#e8d9b6; --stone-dk:#b39b6a;
+  --parch:#fbf4e2; --parch-2:#f2e4c2; --ink:#1b2140; --muted:#5a5f7d;
+  --ok:#1f7a52; --ok-bg:#e1f3e8; --bad:#a23e48; --bad-bg:#fbe7e8;
+  --on-night:#eef0fa; --on-night-muted:#b7bedb; --line:rgba(255,226,160,.22);
+  --f-display:'Frank Ruhl Libre','David Libre','Times New Roman',serif;
+  --f-body:'Rubik','Heebo','Arial Hebrew',Arial,sans-serif;
+  --dawn:0;
+  --r:18px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--night);color:var(--on-night)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:disabled{cursor:default}
+:focus-visible{outline:3px solid var(--gold-hi);outline-offset:3px;border-radius:10px}
+a{color:inherit}
+
+/* ---------- scenery ---------- */
+.sky{position:fixed;inset:0;z-index:-4;background:linear-gradient(180deg,#060b22 0%,#101b4a 50%,#25306a 100%)}
+.sky::after{content:"";position:absolute;inset:0;opacity:calc(var(--dawn) * .9);transition:opacity 2.4s ease;
+  background:linear-gradient(180deg,#26306e 0%,#6a4f8c 30%,#d27f78 58%,#f2b267 78%,#f8dca4 100%)}
+#skyfx{position:fixed;inset:0;z-index:-3;width:100%;height:100%;pointer-events:none}
+.city{position:fixed;inset:auto 0 0 0;z-index:-2;width:100%;height:min(44vh,400px);pointer-events:none}
+.city .rays{transform-box:view-box;transform-origin:600px 205px;animation:spin 90s linear infinite}
+.city .glow{animation:breathe 6s ease-in-out infinite}
+.city .glow{opacity:calc(.35 + var(--dawn) * .55)}
+.city .win{animation:flicker 5s ease-in-out infinite}
+#burst{position:fixed;inset:0;z-index:60;width:100%;height:100%;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes breathe{50%{transform:scale(1.04)}}
+@keyframes flicker{50%{opacity:.55}}
+
+/* ---------- shell ---------- */
+#app{position:relative;z-index:1;max-width:1000px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 46vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:900;font-size:1.35rem;letter-spacing:.2px}
+.brand svg{width:44px;height:34px;color:#2f5fd0}
+.float{animation:float 4.5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-5px) rotate(-2deg)}}
+.hud{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:99px;background:rgba(10,16,44,.62);
+  border:1px solid var(--line);font-weight:600;font-size:.92rem;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+button.chip:hover{border-color:var(--gold)}
+.chip svg{width:22px;height:17px;flex:none}
+.chip .num{font-variant-numeric:tabular-nums;color:var(--gold-hi)}
+.icon-btn{width:40px;height:40px;justify-content:center;padding:0}
+.icon-btn svg{width:20px;height:20px}
+
+.screen{animation:enter .45s ease both}
+@keyframes enter{from{opacity:.001;transform:translateY(10px)}}
+
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;letter-spacing:.6px;color:var(--gold-hi);
+  border:1px solid var(--line);border-radius:99px;padding:5px 12px;background:rgba(10,16,44,.5)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
+.lede{color:var(--on-night-muted);max-width:56ch;font-size:1.08rem}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:13px 22px;font-weight:700;
+  transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;min-height:48px}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:active:not(:disabled){transform:translateY(0) scale(.98)}
+.btn-gold{color:#22180a;background:linear-gradient(135deg,#f6d27b,#e3ad3f 55%,#c98b23);box-shadow:0 8px 24px rgba(227,173,63,.35),inset 0 1px 0 rgba(255,255,255,.55)}
+.btn-gold:disabled{filter:grayscale(.7) brightness(.8);box-shadow:none}
+.btn-ghost{border:1px solid var(--line);background:rgba(10,16,44,.5);color:var(--on-night)}
+.btn-ghost:hover{border-color:var(--gold)}
+.btn-ink{background:var(--ink);color:var(--parch)}
+.btn-line{border:1.5px solid #d8c597;color:var(--ink);background:transparent}
+
+/* ---------- profile screen ---------- */
+.welcome{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:start}
+.welcome > *{min-width:0}
+.hero-copy{display:grid;gap:16px;padding-top:12px}
+.hero-copy h1{font-size:clamp(2.6rem,7vw,4.6rem);line-height:1;font-weight:900}
+.hero-copy h1 span{color:var(--gold-hi);background:linear-gradient(90deg,#ffe9b5,#e3ad3f,#ffe9b5);background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:sheen 5s linear infinite}
+@keyframes sheen{to{background-position:-200% 0}}
+.hero-crown{width:110px;height:84px;color:#c8323c;filter:drop-shadow(0 10px 22px rgba(227,173,63,.45))}
+.facts{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.fact{border-inline-start:2px solid var(--gold);padding-inline-start:10px;font-size:.92rem;color:var(--on-night-muted)}
+.fact b{display:block;font-family:var(--f-display);font-size:1.5rem;color:var(--on-night);font-variant-numeric:tabular-nums;line-height:1.1}
+
+.parch{background:radial-gradient(120% 90% at 85% 0%,#fffaf0 0%,var(--parch) 55%,var(--parch-2) 100%);color:var(--ink);
+  border-radius:var(--r);box-shadow:0 24px 60px rgba(3,6,22,.55),inset 0 0 0 1px rgba(143,98,20,.25),inset 0 0 0 6px var(--parch),inset 0 0 0 7px rgba(143,98,20,.28)}
+.card-pad{padding:clamp(20px,4vw,30px)}
+.form{display:grid;gap:16px}
+.form h2{font-size:1.6rem}
+label.lbl{font-weight:600;font-size:.95rem;display:block;margin-bottom:6px}
+.input{width:100%;font:inherit;padding:12px 14px;border-radius:12px;border:1.5px solid #d6c393;background:#fffdf7;color:var(--ink)}
+.input:focus{outline:none;border-color:var(--gold-dk);box-shadow:0 0 0 3px rgba(227,173,63,.3)}
+.gems{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gem{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;border:1.5px solid #e2d3ad;background:#fffdf7;font-weight:600;font-size:.92rem;color:var(--ink)}
+.gem svg{width:30px;height:23px;flex:none}
+.gem[aria-checked="true"]{border-color:var(--gold-dk);background:#fff3d3;box-shadow:0 0 0 2px rgba(227,173,63,.35)}
+.form-note{font-size:.85rem;color:var(--muted);margin:0}
+.players{display:grid;gap:8px;margin-top:4px}
+.players h3{font-size:1.1rem;margin-bottom:2px}
+.player{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#fff9ea;border:1px solid #ead9b0}
+.player .go{display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-align:right;color:var(--ink)}
+.player svg{width:34px;height:26px;flex:none}
+.player .who{min-width:0}
+.player .who b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.player .who small{color:var(--muted);font-variant-numeric:tabular-nums}
+.player .del{font-size:.82rem;color:var(--muted);padding:6px 8px;border-radius:8px}
+.player .del.confirm{background:var(--bad);color:#fff}
+
+/* ---------- map ---------- */
+.map-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.map-head h2{font-size:clamp(1.8rem,4.5vw,2.6rem)}
+.map-head p{margin:4px 0 0;color:var(--on-night-muted)}
+.progress-crowns{display:flex;gap:4px;align-items:center}
+.progress-crowns svg{width:30px;height:23px;opacity:.28;transition:opacity .4s,transform .4s;color:#c8323c}
+.progress-crowns svg.on{opacity:1;transform:translateY(-2px);filter:drop-shadow(0 0 6px rgba(255,226,160,.7))}
+.journey{position:relative;display:grid;gap:18px;padding-block:18px 10px}
+.journey-path{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.station{position:relative;display:flex;align-items:center;gap:16px;width:min(560px,100%);text-align:right}
+.station:nth-of-type(even){margin-inline-start:auto}
+.node{position:relative;flex:none;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--f-display);font-weight:900;font-size:2rem;color:#2a1c05;
+  background:radial-gradient(circle at 35% 30%,#fff1c4,#e8b649 55%,#a8731a);
+  box-shadow:0 0 0 5px rgba(11,19,48,.85),0 0 0 7px rgba(255,226,160,.6),0 12px 28px rgba(0,0,0,.45)}
+.station.next .node{animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 5px rgba(11,19,48,.85),0 0 0 7px rgba(255,226,160,.9),0 0 36px 8px rgba(255,214,120,.55)}}
+.station.locked .node{background:radial-gradient(circle at 35% 30%,#58628c,#323b66 60%,#222a52);color:#aab2d4}
+.station.locked .node svg{width:26px;height:26px}
+.station.final .node{width:92px;height:92px}
+.station.final .node svg{width:58px;height:44px}
+.sc{flex:1;min-width:0;padding:14px 16px;border-radius:16px;background:rgba(10,16,44,.7);border:1px solid var(--line);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:border-color .2s,transform .2s}
+.station:not(:disabled):hover .sc{border-color:var(--gold);transform:translateX(-3px)}
+.sc .gate{font-size:.78rem;letter-spacing:.8px;color:var(--gold-hi);font-weight:600}
+.sc h3{font-size:1.3rem;margin:2px 0}
+.sc p{margin:0;font-size:.9rem;color:var(--on-night-muted)}
+.sc .meta{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:.85rem;color:var(--on-night-muted);flex-wrap:wrap}
+.mini-crowns{display:inline-flex;gap:2px}
+.mini-crowns svg{width:20px;height:15px;color:#c8323c;opacity:.25}
+.mini-crowns svg.on{opacity:1}
+.station.locked .sc{opacity:.72}
+.map-note{color:var(--on-night-muted);font-size:.88rem;margin-top:12px}
+
+/* ---------- quiz ---------- */
+.quiz{display:grid;gap:0}
+.qtop{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:6px 12px;background:#f0e2bd;color:#6c4c12;font-weight:600;font-size:.86rem;font-variant-numeric:tabular-nums}
+.pill svg{width:18px;height:14px;color:#c8323c}
+.back{font-size:.9rem;color:var(--muted);padding:6px 8px;border-radius:8px}
+.back:hover{color:var(--ink)}
+.qprog{display:flex;gap:5px;margin-bottom:22px}
+.qprog i{flex:1;height:8px;border-radius:99px;background:#e6dcc3;transition:background .35s}
+.qprog i.done-ok{background:linear-gradient(90deg,#e3ad3f,#f6d27b)}
+.qprog i.done-bad{background:#d8b3b6}
+.qprog i.now{background:#c9b27c;box-shadow:0 0 0 2px rgba(227,173,63,.4)}
+.question{font-family:var(--f-display);font-weight:700;font-size:clamp(1.45rem,3.6vw,2.05rem);line-height:1.35;margin:0 0 20px;color:var(--ink)}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.answer{display:flex;align-items:center;gap:12px;min-height:68px;padding:14px 16px;border-radius:16px;text-align:right;font-weight:500;
+  color:var(--ink);background:#fffdf7;border:2px solid #e7d9b5;transition:transform .15s,border-color .15s,background .15s}
+.answer:hover:not(:disabled){border-color:var(--gold);transform:translateY(-2px);background:#fff8e6}
+.answer .letter{flex:none;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#f2e6c6;color:#6c4c12;
+  font-family:var(--f-display);font-weight:900;font-size:1.15rem}
+.answer.correct{border-color:var(--ok);background:var(--ok-bg);color:#124c33}
+.answer.correct .letter{background:var(--ok);color:#fff}
+.answer.wrong{border-color:var(--bad);background:var(--bad-bg);color:#7a2730;animation:shake .4s}
+.answer.wrong .letter{background:var(--bad);color:#fff}
+.answer.dim{opacity:.55}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.feedback{margin-top:16px;padding:16px 18px;border-radius:14px;line-height:1.75;animation:enter .35s ease both}
+.feedback.good{background:var(--ok-bg);color:#124c33;border:1px solid #b6e0c7}
+.feedback.bad{background:#fff4dc;color:#5b3f0c;border:1px solid #efd595}
+.feedback strong{display:block;font-family:var(--f-display);font-size:1.15rem;margin-bottom:4px}
+.source{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-weight:700;color:#7a520d;text-decoration:underline;text-underline-offset:3px}
+.source small{font-weight:500;color:var(--muted);text-decoration:none}
+.qactions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+.hint-btn{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:10px 14px;font-weight:600;background:#fff3d3;border:1px solid #ebcf86;color:#6c4c12}
+.hint-btn svg{width:18px;height:18px}
+.hint-text{margin-top:12px;padding:10px 14px;border-radius:12px;background:#fff8e4;border:1px dashed #e2c06e;color:#6c4c12;font-size:.95rem}
+.streak{font-size:.86rem;color:#7a520d;font-weight:600}
+
+/* ---------- result ---------- */
+.result{text-align:center;display:grid;gap:14px;justify-items:center}
+.result h2{font-size:clamp(1.9rem,5vw,2.6rem)}
+.result .big-crowns{display:flex;gap:12px;justify-content:center;margin-top:4px}
+.result .big-crowns svg{width:74px;height:56px;color:#c8323c;opacity:.18;transform:scale(.7);transition:opacity .4s,transform .5s cubic-bezier(.3,1.6,.5,1)}
+.result .big-crowns svg.on{opacity:1;transform:scale(1);filter:drop-shadow(0 8px 14px rgba(227,173,63,.55))}
+.score-num{font-family:var(--f-display);font-weight:900;font-size:3.2rem;color:#9a6b14;line-height:1;font-variant-numeric:tabular-nums}
+.result p{margin:0;color:var(--muted);max-width:46ch}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.stat{background:#f2e7c9;border-radius:14px;padding:10px 16px;min-width:108px;font-size:.88rem;color:var(--muted)}
+.stat b{display:block;font-family:var(--f-display);font-size:1.45rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.banner{padding:10px 16px;border-radius:12px;background:var(--ink);color:var(--gold-hi);font-weight:600}
+.banner.soft{background:#f2e7c9;color:#6c4c12}
+.row-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- celebration ---------- */
+.celebrate{position:fixed;inset:0;z-index:40;overflow-y:auto;
+  background:radial-gradient(90% 70% at 50% 30%,rgba(255,226,160,.55),rgba(242,178,103,.25) 40%,rgba(11,19,48,.94) 80%);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:calc(24px + env(safe-area-inset-top,0px)) calc(24px + env(safe-area-inset-bottom,0px))}
+.cel-inner{max-width:720px;margin:0 auto;display:grid;gap:18px;justify-items:center;text-align:center}
+.cel-temple{position:relative;width:min(520px,100%);aspect-ratio:3/2;max-width:100%}
+.cel-temple .rays2{position:absolute;inset:-20%;background:repeating-conic-gradient(from 0deg,rgba(255,232,170,.35) 0 6deg,transparent 6deg 18deg);
+  -webkit-mask:radial-gradient(circle,#000 20%,transparent 65%);mask:radial-gradient(circle,#000 20%,transparent 65%);animation:spin 40s linear infinite}
+.cel-temple svg{position:relative;width:100%;height:100%;animation:rise 1.6s cubic-bezier(.2,.9,.3,1) both;filter:drop-shadow(0 0 40px rgba(255,214,120,.8))}
+@keyframes rise{from{opacity:0;transform:translateY(40px) scale(.92)}}
+.cel-inner h2{font-size:clamp(2.4rem,7vw,4rem);font-weight:900;color:#fff6dc;text-shadow:0 4px 30px rgba(227,173,63,.8)}
+.cel-inner .lede{color:#f6ecd2}
+.cert{width:100%;max-width:560px;text-align:center;position:relative;animation:enter .6s .5s ease both}
+.cert .crown-top{width:72px;height:54px;margin:-46px auto 6px;display:block;color:#c8323c}
+.cert h3{font-size:1.7rem;color:var(--ink)}
+.cert .name{font-family:var(--f-display);font-size:2.2rem;font-weight:900;color:#8f6214;margin:6px 0;overflow-wrap:anywhere}
+.cert .date{color:var(--muted);font-size:.9rem}
+.cert .closing{font-family:var(--f-display);font-size:1.05rem;color:var(--ink);margin-top:12px}
+
+/* ---------- modal + toasts ---------- */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:rgba(5,9,26,.7);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.modal .parch{width:min(640px,100%);max-height:86vh;overflow-y:auto;animation:enter .3s ease both}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.modal-head h2{font-size:1.7rem;color:var(--ink)}
+.ach-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ach{display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;background:#fff9ea;border:1px solid #ead9b0;color:var(--ink)}
+.ach .medal{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#fff1c4,#e8b649 60%,#a8731a);box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
+.ach .medal svg{width:30px;height:23px;color:#c8323c}
+.ach.off .medal{background:#e6dcc5;filter:grayscale(1);opacity:.6}
+.ach b{display:block;font-size:.98rem}
+.ach small{color:var(--muted);font-size:.84rem;line-height:1.4;display:block}
+.toasts{position:fixed;z-index:70;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;width:min(420px,calc(100% - 32px))}
+.toast{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--ink);color:var(--on-night);
+  border:1px solid var(--gold);box-shadow:0 14px 40px rgba(0,0,0,.5);animation:toastIn .5s cubic-bezier(.2,1.4,.4,1) both}
+.toast.out{animation:toastOut .4s ease forwards}
+.toast .medal{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#fff1c4,#e8b649 60%,#a8731a)}
+.toast .medal svg{width:26px;height:20px;color:#c8323c}
+.toast small{display:block;color:var(--gold-hi);font-size:.78rem;letter-spacing:.5px}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px) scale(.9)}}
+@keyframes toastOut{to{opacity:0;transform:translateY(10px)}}
+
+.foot{color:var(--on-night-muted);text-align:center;margin-top:30px;font-size:.84rem;line-height:1.8}
+
+@media (max-width:820px){
+  .welcome{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .answers{grid-template-columns:1fr}
+  .ach-list{grid-template-columns:1fr}
+  .node{width:62px;height:62px;font-size:1.6rem}
+  .station.final .node{width:74px;height:74px}
+  .station:nth-of-type(even){margin-inline-start:0;padding-inline-start:28px}
+  .brand span{font-size:1.15rem}
+  .gems{grid-template-columns:repeat(2,1fr)}
+  .hero-crown{width:84px;height:64px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="sky" aria-hidden="true"></div>
+<canvas id="skyfx" aria-hidden="true"></canvas>
+
+<!-- shared symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff2c8"/><stop offset=".38" stop-color="#f1c252"/><stop offset=".72" stop-color="#c8891f"/><stop offset="1" stop-color="#ffe39b"/>
+    </linearGradient>
+    <linearGradient id="gGoldDk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d79b2c"/><stop offset="1" stop-color="#8f6214"/>
+    </linearGradient>
+    <linearGradient id="gStone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbf0d4"/><stop offset="1" stop-color="#d9c393"/>
+    </linearGradient>
+    <linearGradient id="gDoor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe7a6"/><stop offset=".5" stop-color="#e2a83a"/><stop offset="1" stop-color="#9c6a15"/>
+    </linearGradient>
+    <pattern id="ashlar" width="24" height="12" patternUnits="userSpaceOnUse">
+      <rect width="24" height="12" fill="url(#gStone)"/>
+      <path d="M0 6H24M0 12H24M12 0V6M0 6V12" stroke="#c9b27f" stroke-width=".7" fill="none"/>
+    </pattern>
+    <pattern id="merlons" width="22" height="12" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="13" height="12" fill="#9c8760"/>
+    </pattern>
+    <radialGradient id="gGlow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#fff2c4" stop-opacity=".95"/><stop offset=".35" stop-color="#ffd27a" stop-opacity=".45"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <symbol id="crown" viewBox="0 0 64 48">
+    <path d="M7 39 L4 13 L18 24 L32 5 L46 24 L60 13 L57 39 Z" fill="url(#gGold)" stroke="#8a5d12" stroke-width="1.6" stroke-linejoin="round"/>
+    <rect x="6" y="35" width="52" height="9" rx="2.5" fill="url(#gGoldDk)" stroke="#7a500f" stroke-width="1.2"/>
+    <circle cx="4" cy="12" r="3.2" fill="#fff0c0" stroke="#8a5d12" stroke-width="1"/>
+    <circle cx="32" cy="4.5" r="3.4" fill="#fff0c0" stroke="#8a5d12" stroke-width="1"/>
+    <circle cx="60" cy="12" r="3.2" fill="#fff0c0" stroke="#8a5d12" stroke-width="1"/>
+    <path d="M32 21 l5 6 -5 6 -5 -6z" fill="currentColor" stroke="#5a3a08" stroke-width="1"/>
+    <circle cx="18" cy="31" r="2.8" fill="currentColor" stroke="#5a3a08" stroke-width=".8"/>
+    <circle cx="46" cy="31" r="2.8" fill="currentColor" stroke="#5a3a08" stroke-width=".8"/>
+    <path d="M30 23.5 l2 -1.6" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity=".8"/>
+    <rect x="13" y="38" width="6" height="3" rx="1" fill="#fff2c8" opacity=".7"/><rect x="29" y="38" width="6" height="3" rx="1" fill="#fff2c8" opacity=".7"/><rect x="45" y="38" width="6" height="3" rx="1" fill="#fff2c8" opacity=".7"/>
+  </symbol>
+
+  <symbol id="temple" viewBox="0 0 300 200">
+    <rect x="6" y="176" width="288" height="24" fill="#c8b285"/>
+    <rect x="22" y="166" width="256" height="12" fill="#dccaa0"/>
+    <rect x="38" y="158" width="224" height="10" fill="#e9d9b2"/>
+    <rect x="44" y="104" width="54" height="56" fill="url(#ashlar)"/>
+    <rect x="202" y="104" width="54" height="56" fill="url(#ashlar)"/>
+    <rect x="42" y="99" width="58" height="6" fill="url(#gGoldDk)"/>
+    <rect x="200" y="99" width="58" height="6" fill="url(#gGoldDk)"/>
+    <g fill="#a9802d" opacity=".75">
+      <rect x="56" y="120" width="8" height="16" rx="4"/><rect x="78" y="120" width="8" height="16" rx="4"/>
+      <rect x="214" y="120" width="8" height="16" rx="4"/><rect x="236" y="120" width="8" height="16" rx="4"/>
+    </g>
+    <rect x="94" y="36" width="112" height="124" fill="url(#ashlar)"/>
+    <rect x="90" y="30" width="120" height="8" fill="url(#gGold)"/>
+    <path id="templeSpikes" d="" fill="url(#gGold)"/>
+    <rect x="94" y="64" width="112" height="4" fill="url(#gGoldDk)" opacity=".85"/>
+    <path d="M128 160 V100 a22 22 0 0 1 44 0 V160Z" fill="#5b3c0c"/>
+    <path d="M133 160 V102 a17 17 0 0 1 34 0 V160Z" fill="url(#gDoor)"/>
+    <path d="M150 85 V160" stroke="#8f6214" stroke-width="1.4"/>
+    <path d="M112 80 q38 -20 76 0" stroke="url(#gGold)" stroke-width="3" fill="none"/>
+    <g fill="#e3ad3f"><circle cx="118" cy="78" r="2.2"/><circle cx="134" cy="72" r="2.2"/><circle cx="150" cy="70" r="2.2"/><circle cx="166" cy="72" r="2.2"/><circle cx="182" cy="78" r="2.2"/></g>
+    <rect x="100" y="104" width="10" height="20" rx="5" fill="#a9802d" opacity=".7"/>
+    <rect x="190" y="104" width="10" height="20" rx="5" fill="#a9802d" opacity=".7"/>
+  </symbol>
+
+  <symbol id="lock" viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><rect x="4.5" y="10" width="15" height="11" rx="3" fill="currentColor"/></symbol>
+  <symbol id="bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="snd-on" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="snd-off" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="medal" viewBox="0 0 24 24"><path d="M8 2h8l-2 6h-4z" fill="currentColor" opacity=".6"/><circle cx="12" cy="15" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11.5l1.1 2.3 2.4.3-1.8 1.6.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.6 2.4-.3z" fill="currentColor"/></symbol>
+  <symbol id="book" viewBox="0 0 24 24"><path d="M4 5c3-1.5 6-1.5 8 .5 2-2 5-2 8-.5v14c-3-1.5-6-1.5-8 .5-2-2-5-2-8-.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 5.5V20" stroke="currentColor" stroke-width="1.8"/></symbol>
+</svg>
+
+<svg class="city" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <path d="M0 300 Q160 240 330 278 T700 262 T1200 286 V420 H0Z" fill="#17234f"/>
+  <g class="glow" style="transform-box:view-box;transform-origin:600px 205px"><circle cx="600" cy="205" r="230" fill="url(#gGlow)"/></g>
+  <g class="rays" id="rays" opacity=".35"></g>
+  <path d="M360 340 Q600 196 840 340Z" fill="#1d2a5a"/>
+  <use href="#temple" x="465" y="118" width="270" height="180"/>
+  <g id="houses"></g>
+  <rect x="0" y="342" width="1200" height="60" fill="#8c7853"/>
+  <rect x="0" y="342" width="1200" height="6" fill="#a8946b"/>
+  <rect x="0" y="330" width="1200" height="12" fill="url(#merlons)"/>
+  <g id="towers"></g>
+  <rect x="0" y="398" width="1200" height="22" fill="#0a1028"/>
+</svg>
+
+<canvas id="burst" aria-hidden="true"></canvas>
+
+<div id="app" dir="rtl" lang="he">
+  <header class="topbar">
+    <div class="brand"><svg class="float" style="color:#2f5fd0"><use href="#crown"/></svg><span>מסע הגאולה</span></div>
+    <div class="hud" id="hud" hidden>
+      <button class="chip" id="hudPlayer" type="button" title="החלפת שחקן"><svg id="hudGem"><use href="#crown"/></svg><span id="hudName"></span></button>
+      <span class="chip" title="נקודות שנאספו"><svg style="color:#e3ad3f"><use href="#crown"/></svg><span class="num" id="hudPoints">0</span></span>
+      <button class="chip" id="hudAch" type="button"><svg style="color:currentColor;width:18px;height:18px"><use href="#medal"/></svg><span class="num" id="hudAchCount">0/9</span></button>
+      <button class="chip icon-btn" id="sndBtn" type="button" aria-label="צלילים"><svg><use id="sndIcon" href="#snd-on"/></svg></button>
+    </div>
+    <button class="chip icon-btn" id="sndBtn2" type="button" aria-label="צלילים"><svg><use id="sndIcon2" href="#snd-on"/></svg></button>
+  </header>
+
+  <main>
+    <!-- PROFILE -->
+    <section class="screen" id="s-profile">
+      <div class="welcome">
+        <div class="hero-copy">
+          <svg class="hero-crown float"><use href="#crown"/></svg>
+          <span class="eyebrow">חידון משיח וגאולה · גילאי 10–12</span>
+          <h1>מסע אל <span>הגאולה</span></h1>
+          <p class="lede">צאו למסע דרך שישה שערים של לימוד, מקורות וידע חסידי. בכל שער אוספים כתרים, פותחים הישגים ומאירים את השמיים מעל ירושלים, עד שבית המקדש השלישי מתגלה באור מלא.</p>
+          <div class="facts">
+            <div class="fact"><b>6</b>שערים במסע</div>
+            <div class="fact"><b>20</b>שאלות עם מקורות</div>
+            <div class="fact"><b>9</b>הישגים לפתוח</div>
+          </div>
+        </div>
+        <div class="parch card-pad">
+          <form class="form" id="newForm" autocomplete="off">
+            <h2>מי יוצא למסע?</h2>
+            <div>
+              <label class="lbl" for="pName">השם שלכם</label>
+              <input class="input" id="pName" maxlength="20" placeholder="לדוגמה: מנחם מענדל" required>
+            </div>
+            <div>
+              <span class="lbl" id="gemLbl">בחרו אבן לכתר שלכם</span>
+              <div class="gems" id="gems" role="radiogroup" aria-labelledby="gemLbl"></div>
+            </div>
+            <button class="btn btn-gold" type="submit">יוצאים לדרך ←</button>
+            <p class="form-note">ההתקדמות נשמרת בדפדפן הזה, כך שאפשר לחזור ולהמשיך מאותה נקודה.</p>
+          </form>
+          <div class="players" id="players" hidden>
+            <h3>ממשיכים מסע</h3>
+            <div id="playerList" style="display:grid;gap:8px"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAP -->
+    <section class="screen" id="s-map" hidden>
+      <div class="map-head">
+        <div>
+          <span class="eyebrow" id="mapEyebrow">שלום!</span>
+          <h2 style="margin-top:10px">מפת המסע לירושלים</h2>
+          <p id="mapSub">כל שער שעוברים מאיר את השמיים מעל ירושלים.</p>
+        </div>
+        <div class="progress-crowns" id="progCrowns" aria-label="שערים שעברתם"></div>
+      </div>
+      <div class="journey" id="journey">
+        <svg class="journey-path" id="jpath" aria-hidden="true"></svg>
+      </div>
+      <p class="map-note">עוברים שער כשעונים נכון על חצי מהשאלות לפחות. כתר אחד לחצי, שניים לשלושה רבעים, שלושה לתשובות מושלמות.</p>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="screen" id="s-quiz" hidden>
+      <div class="parch card-pad quiz">
+        <div class="qtop">
+          <button class="back" id="quitBtn" type="button">→ חזרה למפה</button>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="pill" id="qLevel"></span>
+            <span class="pill"><svg><use href="#crown"/></svg><span id="qScore">0</span></span>
+            <span class="pill" id="qCount"></span>
+          </div>
+        </div>
+        <div class="qprog" id="qprog"></div>
+        <div id="qBody">
+          <h2 class="question" id="qText"></h2>
+          <div class="answers" id="answers"></div>
+          <div id="feedback" hidden></div>
+          <div class="hint-text" id="hintText" hidden></div>
+          <div class="qactions">
+            <button class="hint-btn" id="hintBtn" type="button"><svg><use href="#bulb"/></svg>רמז</button>
+            <span class="streak" id="streak"></span>
+            <button class="btn btn-ink" id="nextBtn" type="button" hidden>לשאלה הבאה ←</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section class="screen" id="s-result" hidden>
+      <div class="parch card-pad result" id="resultBox"></div>
+    </section>
+  </main>
+
+  <footer class="foot">החידון נועד ללימוד ולהנאה. כל המקורות המובאים כאן הם מאתרי חב״ד בלבד.<br>״הנה הנה משיח בא״ — ממשיכים ללמוד, לקיים מצוות ולהוסיף בטוב ובחסד.</footer>
+</div>
+
+<!-- FINAL CELEBRATION -->
+<div class="celebrate" id="celebrate" dir="rtl" lang="he" hidden role="dialog" aria-modal="true" aria-labelledby="celTitle">
+  <div class="cel-inner">
+    <div class="cel-temple"><div class="rays2"></div><svg viewBox="0 0 300 200"><use href="#temple"/></svg></div>
+    <h2 id="celTitle">המסע הושלם!</h2>
+    <p class="lede" id="celLede"></p>
+    <div class="parch card-pad cert">
+      <svg class="crown-top float" id="certCrown"><use href="#crown"/></svg>
+      <h3>תעודת אלופי הגאולה</h3>
+      <div class="name" id="certName"></div>
+      <div class="stats" id="certStats"></div>
+      <div class="date" id="certDate"></div>
+      <div class="closing">״הנה הנה משיח בא״ — ממשיכים ללמוד, לקיים מצוות ולהוסיף בטוב ובחסד.</div>
+    </div>
+    <div class="row-btns">
+      <button class="btn btn-gold" id="celMap" type="button">חזרה למפה</button>
+      <button class="btn btn-ghost" id="celAgain" type="button">לשחק שוב את המסע הגדול</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACHIEVEMENTS -->
+<div class="modal" id="achModal" dir="rtl" lang="he" hidden role="dialog" aria-modal="true" aria-labelledby="achTitle">
+  <div class="parch card-pad">
+    <div class="modal-head"><h2 id="achTitle">ההישגים שלי</h2><button class="btn btn-line" id="achClose" type="button" style="min-height:40px;padding:8px 14px">סגירה</button></div>
+    <div class="ach-list" id="achList"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" dir="rtl" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+document.documentElement.lang='he';
+document.documentElement.dir='rtl';
+
+/* ================= content (unchanged from the original game) ================= */
+const questions = [
+{cat:'moshiach',level:1,q:'מה פירוש המילה העברית ״משיח״?',a:['מי שנמשח בשמן','מי שמטייל בעולם','שם של חג','מלאך שנשלח משמים'],correct:0,ex:'המילה ״משיח״ פירושה ״משוח״ — מי שנמשח בשמן. בתנ״ך התואר ניתן לאנשים בעלי תפקיד חשוב, ובהמשך הוא משמש למלך המשיח.',source:'Chabad.org — What Is the Jewish Belief About Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/108400/jewish/The-End-of-Days.htm',hint:'חשבו על טקס שבו שמן משמש לסימון תפקיד מיוחד.'},
+{cat:'moshiach',level:1,q:'לפי המקורות, מאיזו משפחה מלכותית יהיה משיח?',a:['משפחת אהרן הכהן','בית דוד המלך','משפחת החשמונאים','משפחת משה רבנו'],correct:1,ex:'הרמב״ם ומקורות חב״ד מתארים את משיח כמלך מבית דוד, צאצא של דוד המלך.',source:'Chabad.org — Who Is Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/1121893/jewish/Who-Is-Moshiach-the-Jewish-Messiah.htm',hint:'איזה מלך מוזכר בשושלת המלכות של משיח?'},
+{cat:'moshiach',level:2,q:'איזה תפקיד מרכזי מתואר אצל הרמב״ם למלך המשיח?',a:['לבנות ערים חדשות באירופה','להחזיר את מלכות בית דוד ולפעול לפי התורה','להפסיק ללמוד תורה','להחליף את כל החגים'],correct:1,ex:'לפי הרמב״ם, משיח מחזיר את מלכות בית דוד ומוביל את עם ישראל בדרך התורה והמצוות.',source:'Chabad.org — Who Is Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/1121893/jewish/Who-Is-Moshiach-the-Jewish-Messiah.htm',hint:'משיח הוא מלך שמנהיג את עם ישראל לפי התורה.'},
+{cat:'moshiach',level:2,q:'האם לפי המקור החב״די משיח חייב לעשות ניסים כדי לזהותו?',a:['כן, תמיד','לא. ניסים אינם תנאי הכרחי','רק אם הוא עושה עשרה ניסים','כן, אבל רק בירושלים'],correct:1,ex:'המקור מסביר שעל פי הקריטריונים של הרמב״ם, עשיית ניסים אינה תנאי הכרחי לזיהוי משיח.',source:'Chabad.org — Who Is Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/1121893/jewish/Who-Is-Moshiach-the-Jewish-Messiah.htm',hint:'המקור אומר במפורש שניסים אינם דרישה הכרחית.'},
+{cat:'geulah',level:1,q:'מהי גאולה?',a:['חג שמתקיים פעם בשנה','היציאה מהגלות והגעה למצב של חירות ושלמות','שם של תפילה בלבד','מסע למדינה אחרת'],correct:1,ex:'גאולה היא היציאה מהגלות. לפי מאמרי חב״ד, הגאולה אינה מוחקת את הטוב שבחיים שלנו, אלא מגלה ומרוממת אותו.',source:'Chabad.org — Source Texts: Geulah',url:'https://www.chabad.org/library/article_cdo/aid/332758/jewish/Source-Texts.htm',hint:'ההפך מגלות.'},
+{cat:'geulah',level:1,q:'איזה בית מקדש יבנה בירושלים בגאולה?',a:['בית המקדש הראשון בלבד','בית המקדש השלישי','בית כנסת חדש','לא יהיה בית מקדש'],correct:1,ex:'במקורות חב״ד על הגאולה מובא שמשיח יבנה את בית המקדש בירושלים.',source:'Chabad.org — Moshiach 101',url:'https://www.chabad.org/library/article_cdo/aid/332562/jewish/Moshiach-101.htm',hint:'הראשון נבנה בימי שלמה, השני בימי בית שני. מה יהיה הבא?'},
+{cat:'geulah',level:2,q:'מה מתואר כאחד הדברים שיקרו עם ביאת משיח?',a:['כל היהודים יתקבצו לארץ ישראל','כל העולם יפסיק ללמוד','ירושלים תיעלם','לא יהיו יותר מצוות'],correct:0,ex:'מקורות חב״ד מתארים את קיבוץ גלויות — חזרת היהודים מכל העולם לארץ ישראל — כחלק מתהליך הגאולה.',source:'Chabad.org — What Is the Jewish Belief About Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/108400/jewish/The-End-of-Days.htm',hint:'הכוונה היא לחזרה של יהודים מכל העולם לארץ.'},
+{cat:'geulah',level:2,q:'איזה נביא מתאר את העולם מלא בידיעת ה׳ כמו מים המכסים את הים?',a:['יונה','ישעיהו','נחום','חבקוק'],correct:1,ex:'הפסוק ״כי מלאה הארץ דעה את ה׳ כמים לים מכסים״ מופיע בישעיהו י״א, והוא מובא במקורות חב״ד על ימות המשיח.',source:'Chabad.org — The Rebbe on Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/5163190/jewish/The-Rebbe-on-Moshiach.htm',hint:'הפסוק נמצא בפרק י״א בספר נביאים.'},
+{cat:'rebbe',level:1,q:'על מה הרבי הדגיש שצריך ללמוד כדי להתכונן לגאולה?',a:['רק סיפורי מלחמות','ענייני משיח וגאולה','רק חשבון','רק היסטוריה כללית'],correct:1,ex:'הרבי הדגיש את החשיבות של לימוד ענייני משיח וגאולה, כדי שהנושא יהיה חי ומורגש בחיי היום-יום.',source:'Chabad.org — Awaiting Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/1121885/jewish/Awaiting-Moshiach.htm',hint:'לימוד על הנושא שאותו מחכים.'},
+{cat:'rebbe',level:2,q:'באיזו שיחה מפורסמת הרבי הטיל על החסידים לעשות כל שביכולתם להביא את משיח?',a:['שיחת כ״ח ניסן תנש״א','שיחת פורים קטן','שיחת חנוכה תשמ״ב','שיחת ראש השנה תש״ל'],correct:0,ex:'בשיחת כ״ח ניסן תנש״א הרבי עורר שכל אחד יעשה כל שביכולתו להביא את משיח, מתוך פעולה ממשית.',source:'Chabad.org — It’s Up To You!',url:'https://www.chabad.org/library/article_cdo/aid/1181/jewish/Its-Up-To-You.htm',hint:'התאריך הוא בסוף חודש ניסן, בשנת 5751.'},
+{cat:'rebbe',level:2,q:'מה הרבי ביקש שנעשה כדי להיות מוכנים לקבל את משיח?',a:['להפסיק את כל הפעילות היומיומית','להוסיף בלימוד תורה, מצוות ומעשים טובים','לחכות בלי לעשות דבר','ללמוד רק כשמשיח כבר מגיע'],correct:1,ex:'המקורות החב״דיים מדגישים הכנה לגאולה באמצעות לימוד, קיום מצוות, טוב וחסד, והפצת יהדות.',source:'Chabad.org — What Is the Jewish Belief About Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/108400/jewish/The-End-of-Days.htm',hint:'ההכנה נעשית דרך חיים יהודיים פעילים.'},
+{cat:'prepare',level:1,q:'איזו פעולה טובה יכולה לעזור להתכונן לגאולה?',a:['לעזור לחבר','לריב עם חבר','להתעלם ממי שצריך עזרה','להפסיק ללמוד'],correct:0,ex:'המקורות מדגישים הוספה במעשים טובים ובחסד כהכנה לגאולה.',source:'Chabad.org — Awaiting Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/1121885/jewish/Awaiting-Moshiach.htm',hint:'בחרו פעולה שמוסיפה טוב בעולם.'},
+{cat:'prepare',level:1,q:'מה פירוש הביטוי ״לחיות עם משיח״?',a:['לדמיין בלבד ולא לעשות כלום','ללמוד על הגאולה ולחיות לפי הערכים שלה כבר עכשיו','לעזוב את כל החיים הרגילים','ללמוד רק על מלכים'],correct:1,ex:'״לחיות עם משיח״ פירושו ללמוד על הגאולה ולהכניס את ערכיה לחיי היום-יום — תורה, מצוות, טוב וחסד.',source:'Chabad.org — Awaiting Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/1121885/jewish/Awaiting-Moshiach.htm',hint:'זה קשור ללימוד ולדרך החיים שלנו כבר עכשיו.'},
+{cat:'prepare',level:2,q:'לפי מאמר חב״די, מה יכולה לעשות צדקה?',a:['לעכב את הגאולה','להיות גורם שמזרז את הגאולה','להחליף לימוד תורה','להיות שייכת רק לחגים'],correct:1,ex:'במאמר חב״ד על משיח נאמר שצדקה היא גורם שמזרז את הגאולה, ולכן חשוב להוסיף בנתינת צדקה.',source:'Chabad.org — What Is the Jewish Belief About Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/108400/jewish/The-End-of-Days.htm',hint:'נתינה ועזרה לאחרים — פעולה של חסד.'},
+{cat:'sources',level:2,q:'איזה ספר הלכה מרכזי של הרמב״ם מתאר את הלכות מלכים ומשיח?',a:['משנה תורה','ספר תהילים','מגילת אסתר','סידור התפילה'],correct:0,ex:'משנה תורה הוא ספר ההלכה של הרמב״ם. הלכות מלכים ומלחמות כוללות את תיאורו של מלך המשיח.',source:'Chabad.org — Moshiach',url:'https://www.chabad.org/parshah/article_cdo/aid/1266875/jewish/Moshiach.htm',hint:'שמו של הספר הוא גם שם נוסף ל״יד החזקה״.'},
+{cat:'sources',level:2,q:'איזה אתר חב״די הוא המקור למאמר ״Moshiach 101״?',a:['Chabad.org','אתר חדשות כללי','ויקיפדיה','אתר משחקים'],correct:0,ex:'Moshiach 101 הוא מדור באתר Chabad.org שמציג מבוא לנושאי משיח וגאולה.',source:'Chabad.org — Moshiach 101',url:'https://www.chabad.org/library/article_cdo/aid/332562/jewish/Moshiach-101.htm',hint:'כל המקורות בחידון הזה נלקחו מאתר חב״די.'},
+{cat:'sources',level:3,q:'מה מלמד המקור החב״די על הגאולה ביחס לחיים שלנו כיום?',a:['הגאולה מבטלת כל דבר טוב שהיה בעבר','הגאולה מגלה ומרוממת את הטוב שכבר קיים','הגאולה קשורה רק לעבר','אין קשר בין החיים שלנו לגאולה'],correct:1,ex:'במקור של הרבי מוסבר שהגאולה אינה שלילה של החיים הנוכחיים, אלא גילוי והשלמה של הטוב שבהם.',source:'Chabad.org — Source Texts',url:'https://www.chabad.org/library/article_cdo/aid/332758/jewish/Source-Texts.htm',hint:'הגאולה מוסיפה ומגלה את הטוב — לא מוחקת אותו.'},
+{cat:'moshiach',level:3,q:'לפי המקור על הרמב״ם, מהו אחד הסימנים המעשיים של מנהיג שהוא בחזקת משיח?',a:['הוא לומד תורה ומחזק את קיום המצוות','הוא מפסיק ללמוד תורה','הוא מבטיח עושר בלבד','הוא חייב להופיע עם כתר'],correct:0,ex:'המקור מביא את קריטריוני הרמב״ם: מנהיג יהודי העוסק בתורה, מקפיד על מצוות ומשפיע על העם ללכת בדרך התורה.',source:'Chabad.org — Who Is Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/1121893/jewish/Who-Is-Moshiach-the-Jewish-Messiah.htm',hint:'התשובה קשורה לתורה ולמצוות.'},
+{cat:'geulah',level:3,q:'מה מתאר הרמב״ם על העולם בתקופת משיח?',a:['מלחמות תמידיות','שלום, שפע והזדמנות לעסוק בידיעת ה׳','כולם יפסיקו ללמוד','העולם יישאר בדיוק כמו היום בלי שינוי'],correct:1,ex:'בקטעי הרבי על הרמב״ם מתוארת תקופת משיח כזמן של שלום, שפע והעמקה בידיעת ה׳.',source:'Chabad.org — The Rebbe on Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/5163190/jewish/The-Rebbe-on-Moshiach.htm',hint:'העולם יהיה מלא שלום וידיעת ה׳.'},
+{cat:'prepare',level:3,q:'לפי שיחת כ״ח ניסן, מה נדרש מכל אחד ואחת?',a:['לחכות שרק אחרים יפעלו','לעשות כל שביכולתו בפועל להביא את משיח','לפעול רק פעם אחת בחיים','להימנע מלדבר על גאולה'],correct:1,ex:'הרבי הדגיש שהאחריות אינה רק של אחרים: כל אחד צריך לפעול בפועל, בדרכו, כדי להביא את הגאולה.',source:'Chabad.org — It’s Up To You!',url:'https://www.chabad.org/library/article_cdo/aid/1181/jewish/Its-Up-To-You.htm',hint:'המסר הוא אישי: ״זה תלוי בך״.'}
+];
+
+const LEVELS=[
+  {cat:'moshiach',title:'מי הוא משיח?',desc:'לומדים על תפקידו של מלך המשיח ועל המקורות.',gate:'א'},
+  {cat:'geulah',title:'עולם הגאולה',desc:'מה יקרה בעולם ובירושלים בזמן הגאולה?',gate:'ב'},
+  {cat:'rebbe',title:'הרבי והגאולה',desc:'מסרים, הוראות ופעולות שהרבי הדגיש.',gate:'ג'},
+  {cat:'prepare',title:'מתכוננים לגאולה',desc:'איך כל אחד ואחת יכולים להתכונן ולפעול?',gate:'ד'},
+  {cat:'sources',title:'אתגר המקורות',desc:'שאלות המבוססות על מקורות חב״דיים.',gate:'ה'},
+  {cat:'all',title:'המסע הגדול',desc:'כל הנושאים, כל האתגרים — בואו נראה מה אתם יודעים!',gate:'ו',final:true}
+];
+const GEMS=[
+  {id:'odem',name:'אודם',c:'#c8323c'},{id:'sapir',name:'ספיר',c:'#2f5fd0'},{id:'bareket',name:'ברקת',c:'#1f9a6a'},
+  {id:'leshem',name:'לשם',c:'#e0861e'},{id:'achlama',name:'אחלמה',c:'#7b4bc4'},{id:'yahalom',name:'יהלום',c:'#d9e4f2'}
+];
+const ACH=[
+  {id:'first',title:'צעד ראשון',desc:'עניתם נכון על השאלה הראשונה שלכם'},
+  {id:'level',title:'השער הראשון נפתח',desc:'עברתם שער ראשון במסע'},
+  {id:'nohint',title:'בכוחות עצמי',desc:'עברתם שער שלם בלי להשתמש ברמז'},
+  {id:'perfect',title:'כתר שלם',desc:'עניתם נכון על כל השאלות בשער אחד'},
+  {id:'streak',title:'רצף זהב',desc:'חמש תשובות נכונות ברצף'},
+  {id:'source',title:'חוקרי המקורות',desc:'פתחתם מקור ב-Chabad.org לקריאה'},
+  {id:'crowns',title:'אוצר הכתרים',desc:'אספתם 1,000 נקודות במסע'},
+  {id:'gates',title:'חמשת השערים',desc:'עברתם את חמשת השערים הראשונים'},
+  {id:'champion',title:'אלופי הגאולה',desc:'סיימתם בהצלחה את המסע הגדול'}
+];
+const LETTERS=['א','ב','ג','ד'];
+
+/* ================= storage ================= */
+const KEY='geulah-quest-v2';
+let store={profiles:[],current:null,muted:false};
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&Array.isArray(s.profiles))store=Object.assign(store,s);}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+function me(){return store.profiles.find(p=>p.id===store.current)||null}
+function gemOf(p){return (GEMS.find(g=>g.id===(p&&p.gem))||GEMS[0]).c}
+const $=id=>document.getElementById(id);
+const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================= sound ================= */
+let AC=null;
+function ac(){if(store.muted)return null;try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();}if(AC.state==='suspended')AC.resume();}catch(e){return null}return AC}
+function note(f,t0,dur,o){o=o||{};const a=ac();if(!a)return;try{
+  const osc=a.createOscillator(),g=a.createGain();osc.type=o.type||'sine';osc.frequency.value=f;let n=osc;
+  if(o.filter){const fl=a.createBiquadFilter();fl.type='lowpass';fl.frequency.value=o.filter;osc.connect(fl);n=fl;}
+  n.connect(g);g.connect(a.destination);const s=a.currentTime+t0,v=o.vol||.15,at=o.attack||.01;
+  g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(v,s+at);g.gain.exponentialRampToValueAtTime(.0001,s+dur);
+  osc.start(s);osc.stop(s+dur+.05);}catch(e){}}
+const SFX={
+  tap(){note(880,0,.08,{type:'triangle',vol:.07})},
+  correct(){[1047,1319,1568,2093].forEach((f,i)=>note(f,i*.07,.55,{vol:.13}))},
+  wrong(){note(392,0,.25,{type:'triangle',vol:.11});note(311,.16,.4,{type:'triangle',vol:.11})},
+  hint(){note(1175,0,.3,{vol:.07});note(1568,.09,.35,{vol:.06})},
+  star(i){note(1047+i*262,0,.5,{vol:.12});note(2093+i*262,.04,.35,{vol:.05})},
+  unlock(){[523,659,784,1047,1319].forEach((f,i)=>note(f,i*.09,.5,{type:'triangle',vol:.11}))},
+  achieve(){[1568,1760,2093,2349,2637,3136].forEach((f,i)=>note(f,i*.055,.4,{vol:.06}))},
+  fanfare(){const m=[[392,0,.22],[523,.24,.22],[659,.48,.22],[784,.72,.5],[659,1.24,.22],[784,1.48,1.3]];
+    m.forEach(([f,t,d])=>{note(f,t,d+.12,{type:'sawtooth',vol:.08,filter:1700,attack:.03});note(f*1.5,t,d+.12,{type:'triangle',vol:.045,attack:.03});});
+    [1047,1319,1568,2093].forEach((f,i)=>note(f,1.5+i*.03,1.6,{vol:.05}));}
+};
+function setSoundIcon(){const h=store.muted?'#snd-off':'#snd-on';['sndIcon','sndIcon2'].forEach(id=>$(id).setAttribute('href',h));
+  ['sndBtn','sndBtn2'].forEach(id=>{$(id).setAttribute('aria-pressed',String(!store.muted));$(id).setAttribute('aria-label',store.muted?'הפעלת צלילים':'השתקת צלילים');});}
+function toggleSound(){store.muted=!store.muted;save();setSoundIcon();SFX.tap();}
+
+/* ================= scenery ================= */
+(function buildScene(){
+  // gold spikes on the Temple roof
+  let d='';for(let x=92;x<=204;x+=7){d+=`M${x} 30 l3.5 -7 l3.5 7z`;}
+  $('templeSpikes').setAttribute('d',d);
+  // light rays
+  const rays=$('rays');let r='';for(let i=0;i<24;i++){const a=i*15*Math.PI/180,a2=a+.05;
+    r+=`<path d="M600 205 L${600+Math.cos(a)*700} ${205+Math.sin(a)*700} L${600+Math.cos(a2)*700} ${205+Math.sin(a2)*700}Z" fill="#ffe4a8"/>`;}
+  rays.innerHTML=r;
+  // houses of Jerusalem stone
+  let seed=7;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
+  const tones=['#9d8a64','#8d7a56','#b09d74','#a08d66'];let h='';
+  const cluster=(x0,x1)=>{for(let x=x0;x<x1;){const w=28+rnd()*34,ht=26+rnd()*52,y=344-ht,t=tones[Math.floor(rnd()*tones.length)];
+    h+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" fill="${t}"/>`;
+    h+=`<rect x="${x.toFixed(1)}" y="${(y-3).toFixed(1)}" width="${w.toFixed(1)}" height="3" fill="#bba982"/>`;
+    const n=Math.floor(w/14);for(let k=0;k<n;k++){if(rnd()<.55){const wx=x+6+k*14,wy=y+8+rnd()*Math.max(4,ht-26);
+      h+=`<rect class="win" style="animation-delay:${(rnd()*5).toFixed(2)}s" x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="6" height="9" rx="3" fill="#ffd27a"/>`;}}
+    x+=w+2+rnd()*6;}};
+  cluster(0,470);cluster(732,1200);
+  $('houses').innerHTML=h;
+  // towers + gate
+  let t='';[[120,60],[380,54],[790,54],[1060,60]].forEach(([x,w])=>{t+=`<rect x="${x}" y="300" width="${w}" height="100" fill="#97835c"/><rect x="${x}" y="300" width="${w}" height="5" fill="#b29f77"/>`;
+    for(let k=0;k<Math.floor(w/16);k++)t+=`<rect x="${x+3+k*16}" y="288" width="10" height="12" fill="#97835c"/>`;
+    t+=`<rect x="${x+w/2-4}" y="320" width="8" height="16" rx="4" fill="#3a2f22"/>`;});
+  t+=`<rect x="548" y="296" width="104" height="104" fill="#a08c64"/>`;for(let k=0;k<6;k++)t+=`<rect x="${551+k*17}" y="284" width="11" height="12" fill="#a08c64"/>`;
+  t+=`<path d="M576 400 V350 a24 24 0 0 1 48 0 V400Z" fill="#241c14"/><path d="M576 350 a24 24 0 0 1 48 0" stroke="#e3ad3f" stroke-width="3" fill="none" opacity=".8"/>`;
+  $('towers').innerHTML=t;
+})();
+
+const sky={cv:$('skyfx'),stars:[],motes:[],w:0,h:0,dpr:1};
+function sizeCanvas(c){const d=Math.min(window.devicePixelRatio||1,2);c.dpr=d;c.w=innerWidth;c.h=innerHeight;c.cv.width=c.w*d;c.cv.height=c.h*d;c.cv.getContext('2d').setTransform(d,0,0,d,0,0)}
+function initSky(){sizeCanvas(sky);sky.stars=[];for(let i=0;i<150;i++)sky.stars.push({x:Math.random(),y:Math.random()*.68,r:Math.random()*1.3+.3,p:Math.random()*6.28,s:.6+Math.random()*1.6});
+  sky.motes=[];for(let i=0;i<26;i++)sky.motes.push(newMote(true));}
+function newMote(any){return {x:Math.random()*sky.w,y:any?Math.random()*sky.h:sky.h+10,vy:.15+Math.random()*.35,vx:(Math.random()-.5)*.15,r:.8+Math.random()*1.8,a:.2+Math.random()*.5,p:Math.random()*6.28}}
+function drawSky(t){const c=sky.cv.getContext('2d');c.clearRect(0,0,sky.w,sky.h);
+  const dawn=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dawn'))||0;
+  for(const s of sky.stars){const a=(.35+.65*(.5+.5*Math.sin(t/1000*s.s+s.p)))*(1-dawn*.75);c.globalAlpha=a;c.fillStyle='#fff8e6';c.beginPath();c.arc(s.x*sky.w,s.y*sky.h,s.r,0,6.283);c.fill();}
+  for(const m of sky.motes){m.y-=m.vy;m.x+=m.vx+Math.sin(t/1400+m.p)*.12;if(m.y<-10)Object.assign(m,newMote(false));
+    c.globalAlpha=m.a*(.6+.4*Math.sin(t/700+m.p));const g=c.createRadialGradient(m.x,m.y,0,m.x,m.y,m.r*4);g.addColorStop(0,'#ffe9a8');g.addColorStop(1,'rgba(255,214,120,0)');
+    c.fillStyle=g;c.beginPath();c.arc(m.x,m.y,m.r*4,0,6.283);c.fill();}
+  c.globalAlpha=1;}
+let skyDawn=0;
+function skyLoop(t){drawSky(t);if(!rm)requestAnimationFrame(skyLoop)}
+
+const burst={cv:$('burst'),parts:[],running:false,w:0,h:0};
+function crownPath(c,s){c.beginPath();c.moveTo(-s,s*.55);c.lineTo(-s*1.05,-s*.45);c.lineTo(-s*.5,0);c.lineTo(0,-s*.75);c.lineTo(s*.5,0);c.lineTo(s*1.05,-s*.45);c.lineTo(s,s*.55);c.closePath();}
+function sparkPath(c,s){c.beginPath();for(let i=0;i<8;i++){const r=i%2?s*.32:s,a=i*Math.PI/4;c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.closePath();}
+function spawn(x,y,n,opts){opts=opts||{};for(let i=0;i<n;i++){const ang=opts.rain?Math.PI/2:(-Math.PI/2+(Math.random()-.5)*2.4),sp=opts.rain?1+Math.random()*2.2:3+Math.random()*6;
+  burst.parts.push({x:opts.rain?Math.random()*burst.w:x,y:opts.rain?-20-Math.random()*burst.h*.6:y,vx:Math.cos(ang)*sp+(opts.rain?(Math.random()-.5)*.8:0),vy:Math.sin(ang)*sp,
+    g:opts.rain?.015:.2,rot:Math.random()*6,vr:(Math.random()-.5)*.2,s:opts.rain?7+Math.random()*9:6+Math.random()*8,life:1,
+    decay:opts.rain?.0028:.014+Math.random()*.01,kind:Math.random()<(opts.sparkle||.45)?'spark':'crown',sw:Math.random()*6});}
+  if(!burst.running){burst.running=true;requestAnimationFrame(burstLoop)}}
+function burstLoop(t){const c=burst.cv.getContext('2d');c.clearRect(0,0,burst.w,burst.h);
+  burst.parts=burst.parts.filter(p=>p.life>0&&p.y<burst.h+40);
+  for(const p of burst.parts){p.vy+=p.g;p.x+=p.vx+Math.sin(t/400+p.sw)*.3;p.y+=p.vy;p.rot+=p.vr;p.life-=p.decay;
+    c.save();c.translate(p.x,p.y);c.rotate(p.rot);c.globalAlpha=Math.max(0,Math.min(1,p.life*1.4));
+    if(p.kind==='crown'){crownPath(c,p.s);const g=c.createLinearGradient(-p.s,-p.s,p.s,p.s);g.addColorStop(0,'#fff2c8');g.addColorStop(.5,'#f0bf50');g.addColorStop(1,'#b97d1c');c.fillStyle=g;c.fill();c.lineWidth=1;c.strokeStyle='#8a5d12';c.stroke();}
+    else{sparkPath(c,p.s*.8);c.fillStyle='#fff3c6';c.fill();}
+    c.restore();}
+  if(burst.parts.length)requestAnimationFrame(burstLoop);else{burst.running=false;c.clearRect(0,0,burst.w,burst.h)}}
+function burstFrom(el,n){if(rm)return;const r=el.getBoundingClientRect();spawn(r.left+r.width/2,r.top+r.height/2,n||16)}
+
+function setDawn(){const p=me();let done=0;if(p)LEVELS.forEach(L=>{if(p.levels[L.cat]&&p.levels[L.cat].done)done++});
+  document.documentElement.style.setProperty('--dawn',(done/LEVELS.length).toFixed(3));}
+
+/* ================= screens ================= */
+const SCREENS=['s-profile','s-map','s-quiz','s-result'];
+function show(id){SCREENS.forEach(s=>{$(s).hidden=s!==id});const hasP=!!me()&&id!=='s-profile';$('hud').hidden=!hasP;$('sndBtn2').hidden=hasP;
+  window.scrollTo({top:0,behavior:rm?'auto':'smooth'});}
+
+/* ---- profile ---- */
+let pickedGem=GEMS[0].id;
+function renderGems(){const g=$('gems');g.innerHTML='';GEMS.forEach(gm=>{const b=document.createElement('button');b.type='button';b.className='gem';b.setAttribute('role','radio');
+  b.setAttribute('aria-checked',String(gm.id===pickedGem));b.innerHTML=`<svg style="color:${gm.c}"><use href="#crown"/></svg>`;const s=document.createElement('span');s.textContent=gm.name;b.appendChild(s);
+  b.onclick=()=>{pickedGem=gm.id;SFX.tap();renderGems();};g.appendChild(b);});}
+function renderPlayers(){const list=$('playerList');list.innerHTML='';$('players').hidden=!store.profiles.length;
+  store.profiles.forEach(p=>{const row=document.createElement('div');row.className='player';
+    const go=document.createElement('button');go.type='button';go.className='go';
+    const done=LEVELS.filter(L=>p.levels[L.cat]&&p.levels[L.cat].done).length;
+    go.innerHTML=`<svg style="color:${gemOf(p)}"><use href="#crown"/></svg><span class="who"><b></b><small>${done}/6 שערים · ${p.points.toLocaleString('he-IL')} נקודות</small></span>`;
+    go.querySelector('b').textContent=p.name;go.onclick=()=>{store.current=p.id;save();SFX.unlock();openMap();};
+    const del=document.createElement('button');del.type='button';del.className='del';del.textContent='מחיקה';
+    del.onclick=()=>{if(del.classList.contains('confirm')){store.profiles=store.profiles.filter(x=>x.id!==p.id);if(store.current===p.id)store.current=null;save();renderPlayers();}
+      else{del.classList.add('confirm');del.textContent='למחוק? לחצו שוב';setTimeout(()=>{del.classList.remove('confirm');del.textContent='מחיקה'},3500);}};
+    row.append(go,del);list.appendChild(row);});}
+$('newForm').addEventListener('submit',e=>{e.preventDefault();const name=$('pName').value.trim();if(!name){$('pName').focus();return}
+  const p={id:'p'+Date.now().toString(36),name,gem:pickedGem,points:0,levels:{},ach:{},sources:0};store.profiles.push(p);store.current=p.id;save();
+  $('pName').value='';SFX.unlock();burstFrom(e.submitter||$('newForm'),20);openMap();});
+function openProfiles(){renderGems();renderPlayers();setDawn();show('s-profile');}
+
+/* ---- HUD ---- */
+function renderHud(){const p=me();if(!p)return;$('hudName').textContent=p.name;$('hudGem').style.color=gemOf(p);
+  $('hudPoints').textContent=p.points.toLocaleString('he-IL');$('hudAchCount').textContent=`${Object.keys(p.ach).length}/${ACH.length}`;
+  $('hudAch').setAttribute('aria-label',`הישגים: ${Object.keys(p.ach).length} מתוך ${ACH.length}`);}
+
+/* ---- map ---- */
+function isOpen(p,i){if(i===0)return true;if(LEVELS[i].final)return LEVELS.slice(0,5).every(L=>p.levels[L.cat]&&p.levels[L.cat].done);
+  const prev=p.levels[LEVELS[i-1].cat];return !!(prev&&prev.done);}
+function miniCrowns(n,cls){let s=`<span class="${cls||'mini-crowns'}" aria-label="${n} מתוך 3 כתרים">`;for(let i=0;i<3;i++)s+=`<svg class="${i<n?'on':''}"><use href="#crown"/></svg>`;return s+'</span>'}
+function openMap(){const p=me();if(!p){openProfiles();return}
+  renderHud();setDawn();
+  const done=LEVELS.filter(L=>p.levels[L.cat]&&p.levels[L.cat].done).length;
+  $('mapEyebrow').textContent=`שלום, ${p.name}!`;
+  $('mapSub').textContent=done===0?'מתחילים בשער א׳. כל שער שעוברים מאיר את השמיים מעל ירושלים.':done===6?'עברתם את כל השערים! אפשר לחזור לכל שער ולשפר את הכתרים.':`עברתם ${done} מתוך 6 שערים. השמיים כבר מתחילים להאיר.`;
+  const pc=$('progCrowns');pc.innerHTML='';LEVELS.forEach(L=>{const on=p.levels[L.cat]&&p.levels[L.cat].done;pc.insertAdjacentHTML('beforeend',`<svg class="${on?'on':''}" style="color:${gemOf(p)}"><use href="#crown"/></svg>`)});
+  const j=$('journey');j.querySelectorAll('.station').forEach(n=>n.remove());
+  let nextMarked=false;
+  LEVELS.forEach((L,i)=>{const st=p.levels[L.cat]||{};const open=isOpen(p,i);const b=document.createElement('button');b.type='button';
+    b.className='station'+(open?'':' locked')+(L.final?' final':'');
+    if(open&&!st.done&&!nextMarked){b.classList.add('next');nextMarked=true}
+    b.disabled=!open;const n=questions.filter(q=>L.cat==='all'||q.cat===L.cat).length;
+    const nodeInner=!open?'<svg><use href="#lock"/></svg>':L.final?`<svg style="color:${gemOf(p)}"><use href="#crown"/></svg>`:L.gate;
+    const lockMsg=L.final?'נפתח אחרי חמשת השערים':i>0?`נפתח אחרי שער ${LEVELS[i-1].gate}׳`:'';
+    b.innerHTML=`<span class="node">${nodeInner}</span><span class="sc"><span class="gate">${L.final?'השער האחרון · שער '+L.gate+'׳':'שער '+L.gate+'׳'}</span><h3>${L.title}</h3><p>${L.desc}</p>
+      <span class="meta">${open?miniCrowns(st.stars||0):''}<span>${open?(st.done?`שיא: ${st.best} נקודות`:`${n} שאלות`):lockMsg}</span></span></span>`;
+    b.setAttribute('aria-label',`שער ${L.gate}: ${L.title}${open?'':' (נעול)'}`);
+    b.onclick=()=>{SFX.tap();startLevel(i)};j.appendChild(b);});
+  show('s-map');requestAnimationFrame(drawPath);}
+function drawPath(){const j=$('journey'),svg=$('jpath');if($('s-map').hidden)return;const jr=j.getBoundingClientRect();
+  const pts=[...j.querySelectorAll('.station .node')].map(n=>{const r=n.getBoundingClientRect();return [r.left+r.width/2-jr.left,r.top+r.height/2-jr.top]});
+  if(pts.length<2){svg.innerHTML='';return}
+  const p=me();let doneIdx=-1;LEVELS.forEach((L,i)=>{if(p.levels[L.cat]&&p.levels[L.cat].done&&i===doneIdx+1)doneIdx=i});
+  const seg=(a,b)=>{const my=(a[1]+b[1])/2;return `C${a[0]} ${my} ${b[0]} ${my} ${b[0]} ${b[1]}`};
+  let d=`M${pts[0][0]} ${pts[0][1]}`,dd=d;for(let i=1;i<pts.length;i++){d+=seg(pts[i-1],pts[i]);if(i<=doneIdx+1&&doneIdx>=0)dd+=seg(pts[i-1],pts[i]);}
+  svg.setAttribute('viewBox',`0 0 ${jr.width} ${jr.height}`);
+  svg.innerHTML=`<path d="${d}" fill="none" stroke="rgba(255,226,160,.35)" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>`+
+    (doneIdx>=0?`<path d="${dd}" fill="none" stroke="#e3ad3f" stroke-width="4" stroke-linecap="round" style="filter:drop-shadow(0 0 6px rgba(255,214,120,.7))"/>`:'');}
+
+/* ---- quiz ---- */
+let Q={level:0,list:[],idx:0,score:0,correct:0,hintsThisQ:0,anyHint:false,answered:false,streak:0,results:[]};
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startLevel(i){const L=LEVELS[i];Q={level:i,list:shuffle(L.cat==='all'?questions:questions.filter(q=>q.cat===L.cat)),idx:0,score:0,correct:0,hintsThisQ:0,anyHint:false,answered:false,streak:0,results:[]};
+  $('qLevel').textContent=`שער ${L.gate}׳ · ${L.title}`;show('s-quiz');renderQ();}
+function renderProg(){const pr=$('qprog');pr.innerHTML='';Q.list.forEach((_,i)=>{const s=document.createElement('i');
+  if(i<Q.results.length)s.className=Q.results[i]?'done-ok':'done-bad';else if(i===Q.idx)s.className='now';pr.appendChild(s)});}
+function renderQ(){const q=Q.list[Q.idx];Q.answered=false;Q.hintsThisQ=0;
+  $('qScore').textContent=Q.score;$('qCount').textContent=`שאלה ${Q.idx+1} מתוך ${Q.list.length}`;renderProg();
+  $('qText').textContent=q.q;$('feedback').hidden=true;$('feedback').innerHTML='';$('hintText').hidden=true;$('hintText').textContent='';
+  $('hintBtn').hidden=false;$('nextBtn').hidden=true;$('streak').textContent=Q.streak>=2?`רצף של ${Q.streak} תשובות נכונות`:'';
+  const w=$('answers');w.innerHTML='';q.a.forEach((ans,i)=>{const b=document.createElement('button');b.type='button';b.className='answer';
+    b.innerHTML=`<span class="letter">${LETTERS[i]}</span><span></span>`;b.lastChild.textContent=ans;b.onclick=()=>choose(i,b);w.appendChild(b)});
+  $('qText').focus&&$('qText').setAttribute('tabindex','-1');}
+function choose(n,btn){if(Q.answered)return;Q.answered=true;const q=Q.list[Q.idx],ok=n===q.correct,p=me();
+  [...$('answers').children].forEach((b,i)=>{b.disabled=true;if(i===q.correct)b.classList.add('correct');else if(i===n)b.classList.add('wrong');else b.classList.add('dim')});
+  Q.results.push(ok);
+  if(ok){Q.score+=100+(Q.hintsThisQ===0?25:0);Q.correct++;Q.streak++;SFX.correct();burstFrom(btn,18);grant('first');if(Q.streak>=5)grant('streak');}
+  else{Q.streak=0;SFX.wrong();}
+  const fb=$('feedback');fb.hidden=false;fb.className='feedback '+(ok?'good':'bad');
+  fb.innerHTML=`<strong>${ok?'🎉 כל הכבוד! תשובה נכונה!':'💛 לא נורא — לומדים ומתקדמים!'}</strong><span></span><br><a class="source" target="_blank" rel="noopener"><svg width="18" height="18"><use href="#book"/></svg>לקריאת המקור ב-Chabad.org ↗</a><br><small style="color:var(--muted)"></small>`;
+  fb.querySelector('span').textContent=q.ex;const a=fb.querySelector('a');a.href=q.url;fb.querySelector('small').textContent=q.source;
+  a.addEventListener('click',()=>{const pp=me();if(pp){pp.sources=(pp.sources||0)+1;save();}grant('source')});
+  $('qScore').textContent=Q.score;$('hintBtn').hidden=true;$('streak').textContent=Q.streak>=2?`רצף של ${Q.streak} תשובות נכונות`:'';
+  const nb=$('nextBtn');nb.hidden=false;nb.textContent=Q.idx===Q.list.length-1?'לסיום השער 🏆':'לשאלה הבאה ←';renderProg();
+  setTimeout(()=>nb.focus({preventScroll:true}),50);}
+$('hintBtn').onclick=()=>{if(Q.answered)return;const q=Q.list[Q.idx];const h=$('hintText');h.hidden=false;h.textContent='💡 רמז: '+q.hint;Q.hintsThisQ++;Q.anyHint=true;SFX.hint();};
+$('nextBtn').onclick=()=>{SFX.tap();Q.idx++;if(Q.idx>=Q.list.length){finishLevel();return}renderQ();window.scrollTo({top:0,behavior:rm?'auto':'smooth'})};
+$('quitBtn').onclick=()=>{SFX.tap();openMap()};
+
+/* ---- result ---- */
+function finishLevel(){const p=me(),L=LEVELS[Q.level],pct=Math.round(Q.correct/Q.list.length*100);
+  const stars=pct===100?3:pct>=75?2:pct>=50?1:0,passed=pct>=50,prev=p.levels[L.cat]||{};
+  const wasOpenNext=Q.level<5?isOpen(p,Q.level+1):false;const wasFinalOpen=isOpen(p,5);
+  p.levels[L.cat]={best:Math.max(prev.best||0,Q.score),stars:Math.max(prev.stars||0,stars),done:!!prev.done||passed};
+  p.points+=Q.score;save();
+  if(passed){grant('level');if(!Q.anyHint)grant('nohint');if(stars===3)grant('perfect');}
+  if(p.points>=1000)grant('crowns');
+  if(LEVELS.slice(0,5).every(x=>p.levels[x.cat]&&p.levels[x.cat].done))grant('gates');
+  renderHud();setDawn();
+  if(L.final&&passed){grant('champion');showCelebration();return}
+  const msg=pct>=90?'מדהים! אתם אלופי הגאולה!':pct>=70?'כל הכבוד! אתם בדרך להפוך למומחי גאולה!':pct>=50?'יפה מאוד! המשיכו ללמוד ולהתקדם!':'כל מסע מתחיל בלימוד — נסו שוב ותגלו עוד!';
+  let unlockMsg='';if(passed){if(Q.level<4&&!wasOpenNext)unlockMsg=`שער ${LEVELS[Q.level+1].gate}׳ נפתח: ${LEVELS[Q.level+1].title}`;else if(!wasFinalOpen&&isOpen(p,5))unlockMsg='השער האחרון נפתח: המסע הגדול!';}
+  const box=$('resultBox');
+  box.innerHTML=`<span class="pill">שער ${L.gate}׳ · ${L.title}</span><h2>${passed?'עברתם את השער!':'כמעט שם!'}</h2>${miniCrowns(stars,'big-crowns')}
+    <div class="score-num" id="scoreNum">0</div><p>${msg}</p>
+    <div class="stats"><div class="stat"><b>${Q.correct}/${Q.list.length}</b>תשובות נכונות</div><div class="stat"><b>${pct}%</b>הצלחה</div><div class="stat"><b>${Q.list.length}</b>שאלות</div></div>
+    ${unlockMsg?`<div class="banner">🔓 ${unlockMsg}</div>`:passed?'':'<div class="banner soft">עוברים שער עם חצי מהתשובות נכונות לפחות. רוצים לנסות שוב?</div>'}
+    <div class="row-btns"><button class="btn btn-gold" id="rMap" type="button">${unlockMsg?'לשער הבא ←':'חזרה למפה'}</button><button class="btn btn-line" id="rAgain" type="button">🔄 לשחק שוב בשער הזה</button></div>`;
+  show('s-result');
+  box.querySelectorAll('.big-crowns svg').forEach(s=>{s.classList.remove('on');s.style.color=gemOf(p)});
+  const crowns=[...box.querySelectorAll('.big-crowns svg')];
+  crowns.forEach((s,i)=>{if(i<stars)setTimeout(()=>{s.classList.add('on');SFX.star(i);burstFrom(s,10)},500+i*420)});
+  countUp($('scoreNum'),Q.score,900);
+  if(unlockMsg)setTimeout(SFX.unlock,500+stars*420+200);
+  $('rMap').onclick=()=>{SFX.tap();openMap()};$('rAgain').onclick=()=>{SFX.tap();startLevel(Q.level)};}
+function countUp(el,to,ms){if(rm){el.textContent=to.toLocaleString('he-IL');return}const t0=performance.now();
+  (function f(t){const k=Math.min(1,(t-t0)/ms);el.textContent=Math.round(to*(1-Math.pow(1-k,3))).toLocaleString('he-IL');if(k<1)requestAnimationFrame(f)})(t0);}
+
+/* ---- celebration ---- */
+function showCelebration(){const p=me();$('celebrate').hidden=false;$('celLede').textContent=`${p.name}, עברתם את כל שערי המסע. השמיים מעל ירושלים מוארים, ובית המקדש השלישי מתגלה באור מלא.`;
+  $('certName').textContent=p.name;$('certCrown').style.color=gemOf(p);
+  const best=LEVELS.reduce((s,L)=>s+((p.levels[L.cat]&&p.levels[L.cat].stars)||0),0);
+  $('certStats').innerHTML=`<div class="stat"><b>${p.points.toLocaleString('he-IL')}</b>נקודות</div><div class="stat"><b>${best}/18</b>כתרים</div><div class="stat"><b>${Object.keys(p.ach).length}/${ACH.length}</b>הישגים</div>`;
+  let hd='';try{hd=new Intl.DateTimeFormat('he-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric'}).format(new Date())}catch(e){}
+  $('certDate').textContent=hd?`ניתן ביום ${hd}`:'';
+  $('celebrate').scrollTop=0;SFX.fanfare();
+  if(!rm){spawn(0,0,120,{rain:true,sparkle:.3});setTimeout(()=>spawn(0,0,80,{rain:true,sparkle:.35}),1600);
+    setTimeout(()=>{const r=$('certCrown').getBoundingClientRect();spawn(r.left+r.width/2,r.top,30)},900);}
+  setTimeout(()=>$('celMap').focus({preventScroll:true}),400);}
+$('celMap').onclick=()=>{SFX.tap();$('celebrate').hidden=true;openMap()};
+$('celAgain').onclick=()=>{SFX.tap();$('celebrate').hidden=true;startLevel(5)};
+
+/* ---- achievements ---- */
+let toastQ=[],toastBusy=false;
+function grant(id){const p=me();if(!p||p.ach[id])return;p.ach[id]=Date.now();save();renderHud();toastQ.push(ACH.find(a=>a.id===id));pumpToasts();}
+function pumpToasts(){if(toastBusy||!toastQ.length)return;toastBusy=true;const a=toastQ.shift(),p=me();const t=document.createElement('div');t.className='toast';
+  t.innerHTML=`<span class="medal"><svg style="color:${gemOf(p)}"><use href="#crown"/></svg></span><span><small>הישג חדש נפתח</small><b></b></span>`;t.querySelector('b').textContent=a.title;
+  $('toasts').appendChild(t);setTimeout(SFX.achieve,250);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>{t.remove();toastBusy=false;pumpToasts()},380)},2600);}
+function openAch(){const p=me();if(!p)return;const l=$('achList');l.innerHTML='';
+  ACH.forEach(a=>{const has=!!p.ach[a.id];const d=document.createElement('div');d.className='ach'+(has?'':' off');
+    d.innerHTML=`<span class="medal"><svg style="color:${gemOf(p)}"><use href="#crown"/></svg></span><span><b></b><small></small></span>`;
+    d.querySelector('b').textContent=a.title+(has?'':' 🔒');d.querySelector('small').textContent=a.desc;l.appendChild(d);});
+  $('achModal').hidden=false;SFX.tap();$('achClose').focus();}
+$('hudAch').onclick=openAch;$('achClose').onclick=()=>{$('achModal').hidden=true;$('hudAch').focus()};
+$('achModal').addEventListener('click',e=>{if(e.target===$('achModal')){$('achModal').hidden=true}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('achModal').hidden){$('achModal').hidden=true}});
+$('hudPlayer').onclick=()=>{SFX.tap();openProfiles()};
+$('sndBtn').onclick=toggleSound;$('sndBtn2').onclick=toggleSound;
+
+/* ---- boot ---- */
+function resize(){initSky();sizeCanvas(burst);if(rm)drawSky(0);drawPath();}
+window.addEventListener('resize',()=>{clearTimeout(resize.t);resize.t=setTimeout(resize,120)});
+load();setSoundIcon();resize();if(!rm)requestAnimationFrame(skyLoop);
+if(me())openMap();else openProfiles();
+})();
+</script>
+
+</body>
+</html>
