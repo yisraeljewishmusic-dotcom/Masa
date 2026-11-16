@@ -391,16 +391,16 @@ label.lbl{font-weight:600;font-size:.95rem;display:block;margin-bottom:6px}
           </div>
         </div>
         <div class="parch card-pad">
-          <form class="form" id="newForm" autocomplete="off">
+          <!-- עקפנו את מנגנון הטופס כדי למנוע חסימות של הדפדפן -->
+          <form class="form" id="newForm" autocomplete="off" onsubmit="return false;">
             <h2>מי יוצא למסע?</h2>
             <div>
               <label class="lbl" for="pName">השם שלכם</label>
-              <input class="input" id="pName" maxlength="20" placeholder="לדוגמה: מנחם מענדל" required>
+              <input class="input" type="text" id="pName" maxlength="20" placeholder="לדוגמה: מנחם מענדל">
             </div>
-            <!-- שדות נוספים שיועברו לגוגל -->
             <div>
               <label class="lbl" for="pPhone">טלפון להגרלה</label>
-              <input class="input" type="tel" id="pPhone" maxlength="20" placeholder="מספר טלפון (רשות)">
+              <input class="input" type="text" id="pPhone" maxlength="20" placeholder="מספר טלפון (רשות)">
             </div>
             <div>
               <label class="lbl" for="pEmail">כתובת אימייל</label>
@@ -410,7 +410,7 @@ label.lbl{font-weight:600;font-size:.95rem;display:block;margin-bottom:6px}
               <span class="lbl" id="gemLbl">בחרו אבן לכתר שלכם</span>
               <div class="gems" id="gems" role="radiogroup" aria-labelledby="gemLbl"></div>
             </div>
-            <button class="btn btn-gold" type="submit">יוצאים לדרך ←</button>
+            <button class="btn btn-gold" type="button" id="startBtn">יוצאים לדרך ←</button>
             <p class="form-note">ההתקדמות נשמרת בדפדפן הזה, כך שאפשר לחזור ולהמשיך מאותה נקודה.</p>
           </form>
           <div class="players" id="players" hidden>
@@ -523,4 +523,347 @@ const questions = [
 {cat:'geulah',level:2,q:'מה מתואר כאחד הדברים שיקרו עם ביאת משיח?',a:['כל היהודים יתקבצו לארץ ישראל','כל העולם יפסיק ללמוד','ירושלים תיעלם','לא יהיו יותר מצוות'],correct:0,ex:'מקורות חב״ד מתארים את קיבוץ גלויות — חזרת היהודים מכל העולם לארץ ישראל — כחלק מתהליך הגאולה.',source:'Chabad.org — What Is the Jewish Belief About Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/108400/jewish/The-End-of-Days.htm',hint:'הכוונה היא לחזרה של יהודים מכל העולם לארץ.'},
 {cat:'geulah',level:2,q:'איזה נביא מתאר את העולם מלא בידיעת ה׳ כמו מים המכסים את הים?',a:['יונה','ישעיהו','נחום','חבקוק'],correct:1,ex:'הפסוק ״כי מלאה הארץ דעה את ה׳ כמים לים מכסים״ מופיע בישעיהו י״א, והוא מובא במקורות חב״ד על ימות המשיח.',source:'Chabad.org — The Rebbe on Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/5163190/jewish/The-Rebbe-on-Moshiach.htm',hint:'הפסוק נמצא בפרק י״א בספר נביאים.'},
 {cat:'rebbe',level:1,q:'על מה הרבי הדגיש שצריך ללמוד כדי להתכונן לגאולה?',a:['רק סיפורי מלחמות','ענייני משיח וגאולה','רק חשבון','רק היסטוריה כללית'],correct:1,ex:'הרבי הדגיש את החשיבות של לימוד ענייני משיח וגאולה, כדי שהנושא יהיה חי ומורגש בחיי היום-יום.',source:'Chabad.org — Awaiting Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/1121885/jewish/Awaiting-Moshiach.htm',hint:'לימוד על הנושא שאותו מחכים.'},
-{cat:'rebbe',level:2,q:'באיזו שיחה מפורסמת הרבי הטיל על החסידים לעשות כל שביכולתם להביא את משיח?',a:['שיחת כ״ח ניסן תנש״א','שיחת פורים קטן','שיחת חנוכה תשמ״ב','שיחת ראש השנה תש״
+{cat:'rebbe',level:2,q:'באיזו שיחה מפורסמת הרבי הטיל על החסידים לעשות כל שביכולתם להביא את משיח?',a:['שיחת כ״ח ניסן תנש״א','שיחת פורים קטן','שיחת חנוכה תשמ״ב','שיחת ראש השנה תש״ל'],correct:0,ex:'בשיחת כ״ח ניסן תנש״א הרבי עורר שכל אחד יעשה כל שביכולתו להביא את משיח, מתוך פעולה ממשית.',source:'Chabad.org — It’s Up To You!',url:'https://www.chabad.org/library/article_cdo/aid/1181/jewish/Its-Up-To-You.htm',hint:'התאריך הוא בסוף חודש ניסן, בשנת 5751.'},
+{cat:'rebbe',level:2,q:'מה הרבי ביקש שנעשה כדי להיות מוכנים לקבל את משיח?',a:['להפסיק את כל הפעילות היומיומית','להוסיף בלימוד תורה, מצוות ומעשים טובים','לחכות בלי לעשות דבר','ללמוד רק כשמשיח כבר מגיע'],correct:1,ex:'המקורות החב״דיים מדגישים הכנה לגאולה באמצעות לימוד, קיום מצוות, טוב וחסד, והפצת יהדות.',source:'Chabad.org — What Is the Jewish Belief About Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/108400/jewish/The-End-of-Days.htm',hint:'ההכנה נעשית דרך חיים יהודיים פעילים.'},
+{cat:'prepare',level:1,q:'איזו פעולה טובה יכולה לעזור להתכונן לגאולה?',a:['לעזור לחבר','לריב עם חבר','להתעלם ממי שצריך עזרה','להפסיק ללמוד'],correct:0,ex:'המקורות מדגישים הוספה במעשים טובים ובחסד כהכנה לגאולה.',source:'Chabad.org — Awaiting Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/1121885/jewish/Awaiting-Moshiach.htm',hint:'בחרו פעולה שמוסיפה טוב בעולם.'},
+{cat:'prepare',level:1,q:'מה פירוש הביטוי ״לחיות עם משיח״?',a:['לדמיין בלבד ולא לעשות כלום','ללמוד על הגאולה ולחיות לפי הערכים שלה כבר עכשיו','לעזוב את כל החיים הרגילים','ללמוד רק על מלכים'],correct:1,ex:'״לחיות עם משיח״ פירושו ללמוד על הגאולה ולהכניס את ערכיה לחיי היום-יום — תורה, מצוות, טוב וחסד.',source:'Chabad.org — Awaiting Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/1121885/jewish/Awaiting-Moshiach.htm',hint:'זה קשור ללימוד ולדרך החיים שלנו כבר עכשיו.'},
+{cat:'prepare',level:2,q:'לפי מאמר חב״די, מה יכולה לעשות צדקה?',a:['לעכב את הגאולה','להיות גורם שמזרז את הגאולה','להחליף לימוד תורה','להיות שייכת רק לחגים'],correct:1,ex:'במאמר חב״ד על משיח נאמר שצדקה היא גורם שמזרז את הגאולה, ולכן חשוב להוסיף בנתינת צדקה.',source:'Chabad.org — What Is the Jewish Belief About Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/108400/jewish/The-End-of-Days.htm',hint:'נתינה ועזרה לאחרים — פעולה של חסד.'},
+{cat:'sources',level:2,q:'איזה ספר הלכה מרכזי של הרמב״ם מתאר את הלכות מלכים ומשיח?',a:['משנה תורה','ספר תהילים','מגילת אסתר','סידור התפילה'],correct:0,ex:'משנה תורה הוא ספר ההלכה של הרמב״ם. הלכות מלכים ומלחמות כוללות את תיאורו של מלך המשיח.',source:'Chabad.org — Moshiach',url:'https://www.chabad.org/parshah/article_cdo/aid/1266875/jewish/Moshiach.htm',hint:'שמו של הספר הוא גם שם נוסף ל״יד החזקה״.'},
+{cat:'sources',level:2,q:'איזה אתר חב״די הוא המקור למאמר ״Moshiach 101״?',a:['Chabad.org','אתר חדשות כללי','ויקיפדיה','אתר משחקים'],correct:0,ex:'Moshiach 101 הוא מדור באתר Chabad.org שמציג מבוא לנושאי משיח וגאולה.',source:'Chabad.org — Moshiach 101',url:'https://www.chabad.org/library/article_cdo/aid/332562/jewish/Moshiach-101.htm',hint:'כל המקורות בחידון הזה נלקחו מאתר חב״די.'},
+{cat:'sources',level:3,q:'מה מלמד המקור החב״די על הגאולה ביחס לחיים שלנו כיום?',a:['הגאולה מבטלת כל דבר טוב שהיה בעבר','הגאולה מגלה ומרוממת את הטוב שכבר קיים','הגאולה קשורה רק לעבר','אין קשר בין החיים שלנו לגאולה'],correct:1,ex:'במקור של הרבי מוסבר שהגאולה אינה שלילה של החיים הנוכחיים, אלא גילוי והשלמה של הטוב שבהם.',source:'Chabad.org — Source Texts',url:'https://www.chabad.org/library/article_cdo/aid/332758/jewish/Source-Texts.htm',hint:'הגאולה מוסיפה ומגלה את הטוב — לא מוחקת אותו.'},
+{cat:'moshiach',level:3,q:'לפי המקור על הרמב״ם, מהו אחד הסימנים המעשיים של מנהיג שהוא בחזקת משיח?',a:['הוא לומד תורה ומחזק את קיום המצוות','הוא מפסיק ללמוד תורה','הוא מבטיח עושר בלבד','הוא חייב להופיע עם כתר'],correct:0,ex:'המקור מביא את קריטריוני הרמב״ם: מנהיג יהודי העוסק בתורה, מקפיד על מצוות ומשפיע על העם ללכת בדרך התורה.',source:'Chabad.org — Who Is Moshiach?',url:'https://www.chabad.org/library/article_cdo/aid/1121893/jewish/Who-Is-Moshiach-the-Jewish-Messiah.htm',hint:'התשובה קשורה לתורה ולמצוות.'},
+{cat:'geulah',level:3,q:'מה מתאר הרמב״ם על העולם בתקופת משיח?',a:['מלחמות תמידיות','שלום, שפע והזדמנות לעסוק בידיעת ה׳','כולם יפסיקו ללמוד','העולם יישאר בדיוק כמו היום בלי שינוי'],correct:1,ex:'בקטעי הרבי על הרמב״ם מתוארת תקופת משיח כזמן של שלום, שפע והעמקה בידיעת ה׳.',source:'Chabad.org — The Rebbe on Moshiach',url:'https://www.chabad.org/library/article_cdo/aid/5163190/jewish/The-Rebbe-on-Moshiach.htm',hint:'העולם יהיה מלא שלום וידיעת ה׳.'},
+{cat:'prepare',level:3,q:'לפי שיחת כ״ח ניסן, מה נדרש מכל אחד ואחת?',a:['לחכות שרק אחרים יפעלו','לעשות כל שביכולתו בפועל להביא את משיח','לפעול רק פעם אחת בחיים','להימנע מלדבר על גאולה'],correct:1,ex:'הרבי הדגיש שהאחריות אינה רק של אחרים: כל אחד צריך לפעול בפועל, בדרכו, כדי להביא את הגאולה.',source:'Chabad.org — It’s Up To You!',url:'https://www.chabad.org/library/article_cdo/aid/1181/jewish/Its-Up-To-You.htm',hint:'המסר הוא אישי: ״זה תלוי בך״.'}
+];
+
+const LEVELS=[
+  {cat:'moshiach',title:'מי הוא משיח?',desc:'לומדים על תפקידו של מלך המשיח ועל המקורות.',gate:'א'},
+  {cat:'geulah',title:'עולם הגאולה',desc:'מה יקרה בעולם ובירושלים בזמן הגאולה?',gate:'ב'},
+  {cat:'rebbe',title:'הרבי והגאולה',desc:'מסרים, הוראות ופעולות שהרבי הדגיש.',gate:'ג'},
+  {cat:'prepare',title:'מתכוננים לגאולה',desc:'איך כל אחד ואחת יכולים להתכונן ולפעול?',gate:'ד'},
+  {cat:'sources',title:'אתגר המקורות',desc:'שאלות המבוססות על מקורות חב״דיים.',gate:'ה'},
+  {cat:'all',title:'המסע הגדול',desc:'כל הנושאים, כל האתגרים — בואו נראה מה אתם יודעים!',gate:'ו',final:true}
+];
+const GEMS=[
+  {id:'odem',name:'אודם',c:'#c8323c'},{id:'sapir',name:'ספיר',c:'#2f5fd0'},{id:'bareket',name:'ברקת',c:'#1f9a6a'},
+  {id:'leshem',name:'לשם',c:'#e0861e'},{id:'achlama',name:'אחלמה',c:'#7b4bc4'},{id:'yahalom',name:'יהלום',c:'#d9e4f2'}
+];
+const ACH=[
+  {id:'first',title:'צעד ראשון',desc:'עניתם נכון על השאלה הראשונה שלכם'},
+  {id:'level',title:'השער הראשון נפתח',desc:'עברתם שער ראשון במסע'},
+  {id:'nohint',title:'בכוחות עצמי',desc:'עברתם שער שלם בלי להשתמש ברמז'},
+  {id:'perfect',title:'כתר שלם',desc:'עניתם נכון על כל השאלות בשער אחד'},
+  {id:'streak',title:'רצף זהב',desc:'חמש תשובות נכונות ברצף'},
+  {id:'source',title:'חוקרי המקורות',desc:'פתחתם מקור ב-Chabad.org לקריאה'},
+  {id:'crowns',title:'אוצר הכתרים',desc:'אספתם 1,000 נקודות במסע'},
+  {id:'gates',title:'חמשת השערים',desc:'עברתם את חמשת השערים הראשונים'},
+  {id:'champion',title:'אלופי הגאולה',desc:'סיימתם בהצלחה את המסע הגדול'}
+];
+const LETTERS=['א','ב','ג','ד'];
+
+/* ================= storage ================= */
+const KEY='geulah-quest-v2';
+let store={profiles:[],current:null,muted:false};
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&Array.isArray(s.profiles))store=Object.assign(store,s);}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+function me(){return store.profiles.find(p=>p.id===store.current)||null}
+function gemOf(p){return (GEMS.find(g=>g.id===(p&&p.gem))||GEMS[0]).c}
+const $=id=>document.getElementById(id);
+const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================= sound ================= */
+let AC=null;
+function ac(){if(store.muted)return null;try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();}if(AC.state==='suspended')AC.resume();}catch(e){return null}return AC}
+function note(f,t0,dur,o){o=o||{};const a=ac();if(!a)return;try{
+  const osc=a.createOscillator(),g=a.createGain();osc.type=o.type||'sine';osc.frequency.value=f;let n=osc;
+  if(o.filter){const fl=a.createBiquadFilter();fl.type='lowpass';fl.frequency.value=o.filter;osc.connect(fl);n=fl;}
+  n.connect(g);g.connect(a.destination);const s=a.currentTime+t0,v=o.vol||.15,at=o.attack||.01;
+  g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(v,s+at);g.gain.exponentialRampToValueAtTime(.0001,s+dur);
+  osc.start(s);osc.stop(s+dur+.05);}catch(e){}}
+const SFX={
+  tap(){note(880,0,.08,{type:'triangle',vol:.07})},
+  correct(){[1047,1319,1568,2093].forEach((f,i)=>note(f,i*.07,.55,{vol:.13}))},
+  wrong(){note(392,0,.25,{type:'triangle',vol:.11});note(311,.16,.4,{type:'triangle',vol:.11})},
+  hint(){note(1175,0,.3,{vol:.07});note(1568,.09,.35,{vol:.06})},
+  star(i){note(1047+i*262,0,.5,{vol:.12});note(2093+i*262,.04,.35,{vol:.05})},
+  unlock(){[523,659,784,1047,1319].forEach((f,i)=>note(f,i*.09,.5,{type:'triangle',vol:.11}))},
+  achieve(){[1568,1760,2093,2349,2637,3136].forEach((f,i)=>note(f,i*.055,.4,{vol:.06}))},
+  fanfare(){const m=[[392,0,.22],[523,.24,.22],[659,.48,.22],[784,.72,.5],[659,1.24,.22],[784,1.48,1.3]];
+    m.forEach(([f,t,d])=>{note(f,t,d+.12,{type:'sawtooth',vol:.08,filter:1700,attack:.03});note(f*1.5,t,d+.12,{type:'triangle',vol:.045,attack:.03});});
+    [1047,1319,1568,2093].forEach((f,i)=>note(f,1.5+i*.03,1.6,{vol:.05}));}
+};
+function setSoundIcon(){const h=store.muted?'#snd-off':'#snd-on';['sndIcon','sndIcon2'].forEach(id=>$(id).setAttribute('href',h));
+  ['sndBtn','sndBtn2'].forEach(id=>{$(id).setAttribute('aria-pressed',String(!store.muted));$(id).setAttribute('aria-label',store.muted?'הפעלת צלילים':'השתקת צלילים');});}
+function toggleSound(){store.muted=!store.muted;save();setSoundIcon();SFX.tap();}
+
+/* ================= scenery ================= */
+(function buildScene(){
+  // gold spikes on the Temple roof
+  let d='';for(let x=92;x<=204;x+=7){d+=`M${x} 30 l3.5 -7 l3.5 7z`;}
+  $('templeSpikes').setAttribute('d',d);
+  // light rays
+  const rays=$('rays');let r='';for(let i=0;i<24;i++){const a=i*15*Math.PI/180,a2=a+.05;
+    r+=`<path d="M600 205 L${600+Math.cos(a)*700} ${205+Math.sin(a)*700} L${600+Math.cos(a2)*700} ${205+Math.sin(a2)*700}Z" fill="#ffe4a8"/>`;}
+  rays.innerHTML=r;
+  // houses of Jerusalem stone
+  let seed=7;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
+  const tones=['#9d8a64','#8d7a56','#b09d74','#a08d66'];let h='';
+  const cluster=(x0,x1)=>{for(let x=x0;x<x1;){const w=28+rnd()*34,ht=26+rnd()*52,y=344-ht,t=tones[Math.floor(rnd()*tones.length)];
+    h+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" fill="${t}"/>`;
+    h+=`<rect x="${x.toFixed(1)}" y="${(y-3).toFixed(1)}" width="${w.toFixed(1)}" height="3" fill="#bba982"/>`;
+    const n=Math.floor(w/14);for(let k=0;k<n;k++){if(rnd()<.55){const wx=x+6+k*14,wy=y+8+rnd()*Math.max(4,ht-26);
+      h+=`<rect class="win" style="animation-delay:${(rnd()*5).toFixed(2)}s" x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="6" height="9" rx="3" fill="#ffd27a"/>`;}}
+    x+=w+2+rnd()*6;}};
+  cluster(0,470);cluster(732,1200);
+  $('houses').innerHTML=h;
+  // towers + gate
+  let t='';[[120,60],[380,54],[790,54],[1060,60]].forEach(([x,w])=>{t+=`<rect x="${x}" y="300" width="${w}" height="100" fill="#97835c"/><rect x="${x}" y="300" width="${w}" height="5" fill="#b29f77"/>`;
+    for(let k=0;k<Math.floor(w/16);k++)t+=`<rect x="${x+3+k*16}" y="288" width="10" height="12" fill="#97835c"/>`;
+    t+=`<rect x="${x+w/2-4}" y="320" width="8" height="16" rx="4" fill="#3a2f22"/>`;});
+  t+=`<rect x="548" y="296" width="104" height="104" fill="#a08c64"/>`;for(let k=0;k<6;k++)t+=`<rect x="${551+k*17}" y="284" width="11" height="12" fill="#a08c64"/>`;
+  t+=`<path d="M576 400 V350 a24 24 0 0 1 48 0 V400Z" fill="#241c14"/><path d="M576 350 a24 24 0 0 1 48 0" stroke="#e3ad3f" stroke-width="3" fill="none" opacity=".8"/>`;
+  $('towers').innerHTML=t;
+})();
+
+const sky={cv:$('skyfx'),stars:[],motes:[],w:0,h:0,dpr:1};
+function sizeCanvas(c){const d=Math.min(window.devicePixelRatio||1,2);c.dpr=d;c.w=innerWidth;c.h=innerHeight;c.cv.width=c.w*d;c.cv.height=c.h*d;c.cv.getContext('2d').setTransform(d,0,0,d,0,0)}
+function initSky(){sizeCanvas(sky);sky.stars=[];for(let i=0;i<150;i++)sky.stars.push({x:Math.random(),y:Math.random()*.68,r:Math.random()*1.3+.3,p:Math.random()*6.28,s:.6+Math.random()*1.6});
+  sky.motes=[];for(let i=0;i<26;i++)sky.motes.push(newMote(true));}
+function newMote(any){return {x:Math.random()*sky.w,y:any?Math.random()*sky.h:sky.h+10,vy:.15+Math.random()*.35,vx:(Math.random()-.5)*.15,r:.8+Math.random()*1.8,a:.2+Math.random()*.5,p:Math.random()*6.28}}
+function drawSky(t){const c=sky.cv.getContext('2d');c.clearRect(0,0,sky.w,sky.h);
+  const dawn=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dawn'))||0;
+  for(const s of sky.stars){const a=(.35+.65*(.5+.5*Math.sin(t/1000*s.s+s.p)))*(1-dawn*.75);c.globalAlpha=a;c.fillStyle='#fff8e6';c.beginPath();c.arc(s.x*sky.w,s.y*sky.h,s.r,0,6.283);c.fill();}
+  for(const m of sky.motes){m.y-=m.vy;m.x+=m.vx+Math.sin(t/1400+m.p)*.12;if(m.y<-10)Object.assign(m,newMote(false));
+    c.globalAlpha=m.a*(.6+.4*Math.sin(t/700+m.p));const g=c.createRadialGradient(m.x,m.y,0,m.x,m.y,m.r*4);g.addColorStop(0,'#ffe9a8');g.addColorStop(1,'rgba(255,214,120,0)');
+    c.fillStyle=g;c.beginPath();c.arc(m.x,m.y,m.r*4,0,6.283);c.fill();}
+  c.globalAlpha=1;}
+let skyDawn=0;
+function skyLoop(t){drawSky(t);if(!rm)requestAnimationFrame(skyLoop)}
+
+const burst={cv:$('burst'),parts:[],running:false,w:0,h:0};
+function crownPath(c,s){c.beginPath();c.moveTo(-s,s*.55);c.lineTo(-s*1.05,-s*.45);c.lineTo(-s*.5,0);c.lineTo(0,-s*.75);c.lineTo(s*.5,0);c.lineTo(s*1.05,-s*.45);c.lineTo(s,s*.55);c.closePath();}
+function sparkPath(c,s){c.beginPath();for(let i=0;i<8;i++){const r=i%2?s*.32:s,a=i*Math.PI/4;c.lineTo(Math.cos(a)*r,Math.sin(a)*r);}c.closePath();}
+function spawn(x,y,n,opts){opts=opts||{};for(let i=0;i<n;i++){const ang=opts.rain?Math.PI/2:(-Math.PI/2+(Math.random()-.5)*2.4),sp=opts.rain?1+Math.random()*2.2:3+Math.random()*6;
+  burst.parts.push({x:opts.rain?Math.random()*burst.w:x,y:opts.rain?-20-Math.random()*burst.h*.6:y,vx:Math.cos(ang)*sp+(opts.rain?(Math.random()-.5)*.8:0),vy:Math.sin(ang)*sp,
+    g:opts.rain?.015:.2,rot:Math.random()*6,vr:(Math.random()-.5)*.2,s:opts.rain?7+Math.random()*9:6+Math.random()*8,life:1,
+    decay:opts.rain?.0028:.014+Math.random()*.01,kind:Math.random()<(opts.sparkle||.45)?'spark':'crown',sw:Math.random()*6});}
+  if(!burst.running){burst.running=true;requestAnimationFrame(burstLoop)}}
+function burstLoop(t){const c=burst.cv.getContext('2d');c.clearRect(0,0,burst.w,burst.h);
+  burst.parts=burst.parts.filter(p=>p.life>0&&p.y<burst.h+40);
+  for(const p of burst.parts){p.vy+=p.g;p.x+=p.vx+Math.sin(t/400+p.sw)*.3;p.y+=p.vy;p.rot+=p.vr;p.life-=p.decay;
+    c.save();c.translate(p.x,p.y);c.rotate(p.rot);c.globalAlpha=Math.max(0,Math.min(1,p.life*1.4));
+    if(p.kind==='crown'){crownPath(c,p.s);const g=c.createLinearGradient(-p.s,-p.s,p.s,p.s);g.addColorStop(0,'#fff2c8');g.addColorStop(.5,'#f0bf50');g.addColorStop(1,'#b97d1c');c.fillStyle=g;c.fill();c.lineWidth=1;c.strokeStyle='#8a5d12';c.stroke();}
+    else{sparkPath(c,p.s*.8);c.fillStyle='#fff3c6';c.fill();}
+    c.restore();}
+  if(burst.parts.length)requestAnimationFrame(burstLoop);else{burst.running=false;c.clearRect(0,0,burst.w,burst.h)}}
+function burstFrom(el,n){if(rm)return;const r=el.getBoundingClientRect();spawn(r.left+r.width/2,r.top+r.height/2,n||16)}
+
+function setDawn(){const p=me();let done=0;if(p)LEVELS.forEach(L=>{if(p.levels[L.cat]&&p.levels[L.cat].done)done++});
+  document.documentElement.style.setProperty('--dawn',(done/LEVELS.length).toFixed(3));}
+
+/* ================= screens ================= */
+const SCREENS=['s-profile','s-map','s-quiz','s-result'];
+function show(id){SCREENS.forEach(s=>{$(s).hidden=s!==id});const hasP=!!me()&&id!=='s-profile';$('hud').hidden=!hasP;$('sndBtn2').hidden=hasP;
+  window.scrollTo({top:0,behavior:rm?'auto':'smooth'});}
+
+/* ---- profile ---- */
+let pickedGem=GEMS[0].id;
+function renderGems(){const g=$('gems');g.innerHTML='';GEMS.forEach(gm=>{const b=document.createElement('button');b.type='button';b.className='gem';b.setAttribute('role','radio');
+  b.setAttribute('aria-checked',String(gm.id===pickedGem));b.innerHTML=`<svg style="color:${gm.c}"><use href="#crown"/></svg>`;const s=document.createElement('span');s.textContent=gm.name;b.appendChild(s);
+  b.onclick=()=>{pickedGem=gm.id;SFX.tap();renderGems();};g.appendChild(b);});}
+function renderPlayers(){const list=$('playerList');list.innerHTML='';$('players').hidden=!store.profiles.length;
+  store.profiles.forEach(p=>{const row=document.createElement('div');row.className='player';
+    const go=document.createElement('button');go.type='button';go.className='go';
+    const done=LEVELS.filter(L=>p.levels[L.cat]&&p.levels[L.cat].done).length;
+    go.innerHTML=`<svg style="color:${gemOf(p)}"><use href="#crown"/></svg><span class="who"><b></b><small>${done}/6 שערים · ${p.points.toLocaleString('he-IL')} נקודות</small></span>`;
+    go.querySelector('b').textContent=p.name;go.onclick=()=>{store.current=p.id;save();SFX.unlock();openMap();};
+    const del=document.createElement('button');del.type='button';del.className='del';del.textContent='מחיקה';
+    del.onclick=()=>{if(del.classList.contains('confirm')){store.profiles=store.profiles.filter(x=>x.id!==p.id);if(store.current===p.id)store.current=null;save();renderPlayers();}
+      else{del.classList.add('confirm');del.textContent='למחוק? לחצו שוב';setTimeout(()=>{del.classList.remove('confirm');del.textContent='מחיקה'},3500);}};
+    row.append(go,del);list.appendChild(row);});}
+
+// --- הקוד העמיד שעוקף את הדפדפן ---
+$('startBtn').onclick = e => {
+  const name = $('pName').value.trim();
+  if(!name) { 
+    alert('אנא מלא/י את השם כדי לצאת לדרך!'); 
+    $('pName').focus(); 
+    return; 
+  }
+  const phone = $('pPhone').value.trim();
+  const email = $('pEmail').value.trim();
+  
+  const p = {id:'p'+Date.now().toString(36), name, phone, email, gem:pickedGem, points:0, levels:{}, ach:{}, sources:0};
+  store.profiles.push(p);
+  store.current=p.id;
+  save();
+  
+  $('pName').value=''; $('pPhone').value=''; $('pEmail').value='';
+  SFX.unlock();
+  burstFrom($('startBtn'), 20);
+  openMap();
+};
+
+function openProfiles(){renderGems();renderPlayers();setDawn();show('s-profile');}
+
+/* ---- HUD ---- */
+function renderHud(){const p=me();if(!p)return;$('hudName').textContent=p.name;$('hudGem').style.color=gemOf(p);
+  $('hudPoints').textContent=p.points.toLocaleString('he-IL');$('hudAchCount').textContent=`${Object.keys(p.ach).length}/${ACH.length}`;
+  $('hudAch').setAttribute('aria-label',`הישגים: ${Object.keys(p.ach).length} מתוך ${ACH.length}`);}
+
+/* ---- map ---- */
+function isOpen(p,i){if(i===0)return true;if(LEVELS[i].final)return LEVELS.slice(0,5).every(L=>p.levels[L.cat]&&p.levels[L.cat].done);
+  const prev=p.levels[LEVELS[i-1].cat];return !!(prev&&prev.done);}
+function miniCrowns(n,cls){let s=`<span class="${cls||'mini-crowns'}" aria-label="${n} מתוך 3 כתרים">`;for(let i=0;i<3;i++)s+=`<svg class="${i<n?'on':''}"><use href="#crown"/></svg>`;return s+'</span>'}
+function openMap(){const p=me();if(!p){openProfiles();return}
+  renderHud();setDawn();
+  const done=LEVELS.filter(L=>p.levels[L.cat]&&p.levels[L.cat].done).length;
+  $('mapEyebrow').textContent=`שלום, ${p.name}!`;
+  $('mapSub').textContent=done===0?'מתחילים בשער א׳. כל שער שעוברים מאיר את השמיים מעל ירושלים.':done===6?'עברתם את כל השערים! אפשר לחזור לכל שער ולשפר את הכתרים.':`עברתם ${done} מתוך 6 שערים. השמיים כבר מתחילים להאיר.`;
+  const pc=$('progCrowns');pc.innerHTML='';LEVELS.forEach(L=>{const on=p.levels[L.cat]&&p.levels[L.cat].done;pc.insertAdjacentHTML('beforeend',`<svg class="${on?'on':''}" style="color:${gemOf(p)}"><use href="#crown"/></svg>`)});
+  const j=$('journey');j.querySelectorAll('.station').forEach(n=>n.remove());
+  let nextMarked=false;
+  LEVELS.forEach((L,i)=>{const st=p.levels[L.cat]||{};const open=isOpen(p,i);const b=document.createElement('button');b.type='button';
+    b.className='station'+(open?'':' locked')+(L.final?' final':'');
+    if(open&&!st.done&&!nextMarked){b.classList.add('next');nextMarked=true}
+    b.disabled=!open;const n=questions.filter(q=>L.cat==='all'||q.cat===L.cat).length;
+    const nodeInner=!open?'<svg><use href="#lock"/></svg>':L.final?`<svg style="color:${gemOf(p)}"><use href="#crown"/></svg>`:L.gate;
+    const lockMsg=L.final?'נפתח אחרי חמשת השערים':i>0?`נפתח אחרי שער ${LEVELS[i-1].gate}׳`:'';
+    b.innerHTML=`<span class="node">${nodeInner}</span><span class="sc"><span class="gate">${L.final?'השער האחרון · שער '+L.gate+'׳':'שער '+L.gate+'׳'}</span><h3>${L.title}</h3><p>${L.desc}</p>
+      <span class="meta">${open?miniCrowns(st.stars||0):''}<span>${open?(st.done?`שיא: ${st.best} נקודות`:`${n} שאלות`):lockMsg}</span></span></span>`;
+    b.setAttribute('aria-label',`שער ${L.gate}: ${L.title}${open?'':' (נעול)'}`);
+    b.onclick=()=>{SFX.tap();startLevel(i)};j.appendChild(b);});
+  show('s-map');requestAnimationFrame(drawPath);}
+function drawPath(){const j=$('journey'),svg=$('jpath');if($('s-map').hidden)return;const jr=j.getBoundingClientRect();
+  const pts=[...j.querySelectorAll('.station .node')].map(n=>{const r=n.getBoundingClientRect();return [r.left+r.width/2-jr.left,r.top+r.height/2-jr.top]});
+  if(pts.length<2){svg.innerHTML='';return}
+  const p=me();let doneIdx=-1;LEVELS.forEach((L,i)=>{if(p.levels[L.cat]&&p.levels[L.cat].done&&i===doneIdx+1)doneIdx=i});
+  const seg=(a,b)=>{const my=(a[1]+b[1])/2;return `C${a[0]} ${my} ${b[0]} ${my} ${b[0]} ${b[1]}`};
+  let d=`M${pts[0][0]} ${pts[0][1]}`,dd=d;for(let i=1;i<pts.length;i++){d+=seg(pts[i-1],pts[i]);if(i<=doneIdx+1&&doneIdx>=0)dd+=seg(pts[i-1],pts[i]);}
+  svg.setAttribute('viewBox',`0 0 ${jr.width} ${jr.height}`);
+  svg.innerHTML=`<path d="${d}" fill="none" stroke="rgba(255,226,160,.35)" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>`+
+    (doneIdx>=0?`<path d="${dd}" fill="none" stroke="#e3ad3f" stroke-width="4" stroke-linecap="round" style="filter:drop-shadow(0 0 6px rgba(255,214,120,.7))"/>`:'');}
+
+/* ---- quiz ---- */
+let Q={level:0,list:[],idx:0,score:0,correct:0,hintsThisQ:0,anyHint:false,answered:false,streak:0,results:[]};
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startLevel(i){const L=LEVELS[i];Q={level:i,list:shuffle(L.cat==='all'?questions:questions.filter(q=>q.cat===L.cat)),idx:0,score:0,correct:0,hintsThisQ:0,anyHint:false,answered:false,streak:0,results:[]};
+  $('qLevel').textContent=`שער ${L.gate}׳ · ${L.title}`;show('s-quiz');renderQ();}
+function renderProg(){const pr=$('qprog');pr.innerHTML='';Q.list.forEach((_,i)=>{const s=document.createElement('i');
+  if(i<Q.results.length)s.className=Q.results[i]?'done-ok':'done-bad';else if(i===Q.idx)s.className='now';pr.appendChild(s)});}
+function renderQ(){const q=Q.list[Q.idx];Q.answered=false;Q.hintsThisQ=0;
+  $('qScore').textContent=Q.score;$('qCount').textContent=`שאלה ${Q.idx+1} מתוך ${Q.list.length}`;renderProg();
+  $('qText').textContent=q.q;$('feedback').hidden=true;$('feedback').innerHTML='';$('hintText').hidden=true;$('hintText').textContent='';
+  $('hintBtn').hidden=false;$('nextBtn').hidden=true;$('streak').textContent=Q.streak>=2?`רצף של ${Q.streak} תשובות נכונות`:'';
+  const w=$('answers');w.innerHTML='';q.a.forEach((ans,i)=>{const b=document.createElement('button');b.type='button';b.className='answer';
+    b.innerHTML=`<span class="letter">${LETTERS[i]}</span><span></span>`;b.lastChild.textContent=ans;b.onclick=()=>choose(i,b);w.appendChild(b)});
+  $('qText').focus&&$('qText').setAttribute('tabindex','-1');}
+function choose(n,btn){if(Q.answered)return;Q.answered=true;const q=Q.list[Q.idx],ok=n===q.correct,p=me();
+  [...$('answers').children].forEach((b,i)=>{b.disabled=true;if(i===q.correct)b.classList.add('correct');else if(i===n)b.classList.add('wrong');else b.classList.add('dim')});
+  Q.results.push(ok);
+  if(ok){Q.score+=100+(Q.hintsThisQ===0?25:0);Q.correct++;Q.streak++;SFX.correct();burstFrom(btn,18);grant('first');if(Q.streak>=5)grant('streak');}
+  else{Q.streak=0;SFX.wrong();}
+  const fb=$('feedback');fb.hidden=false;fb.className='feedback '+(ok?'good':'bad');
+  fb.innerHTML=`<strong>${ok?'🎉 כל הכבוד! תשובה נכונה!':'💛 לא נורא — לומדים ומתקדמים!'}</strong><span></span><br><a class="source" target="_blank" rel="noopener"><svg width="18" height="18"><use href="#book"/></svg>לקריאת המקור ב-Chabad.org ↗</a><br><small style="color:var(--muted)"></small>`;
+  fb.querySelector('span').textContent=q.ex;const a=fb.querySelector('a');a.href=q.url;fb.querySelector('small').textContent=q.source;
+  a.addEventListener('click',()=>{const pp=me();if(pp){pp.sources=(pp.sources||0)+1;save();}grant('source')});
+  $('qScore').textContent=Q.score;$('hintBtn').hidden=true;$('streak').textContent=Q.streak>=2?`רצף של ${Q.streak} תשובות נכונות`:'';
+  const nb=$('nextBtn');nb.hidden=false;nb.textContent=Q.idx===Q.list.length-1?'לסיום השער 🏆':'לשאלה הבאה ←';renderProg();
+  setTimeout(()=>nb.focus({preventScroll:true}),50);}
+$('hintBtn').onclick=()=>{if(Q.answered)return;const q=Q.list[Q.idx];const h=$('hintText');h.hidden=false;h.textContent='💡 רמז: '+q.hint;Q.hintsThisQ++;Q.anyHint=true;SFX.hint();};
+$('nextBtn').onclick=()=>{SFX.tap();Q.idx++;if(Q.idx>=Q.list.length){finishLevel();return}renderQ();window.scrollTo({top:0,behavior:rm?'auto':'smooth'})};
+$('quitBtn').onclick=()=>{SFX.tap();openMap()};
+
+/* ---- result ---- */
+function finishLevel(){const p=me(),L=LEVELS[Q.level],pct=Math.round(Q.correct/Q.list.length*100);
+  const stars=pct===100?3:pct>=75?2:pct>=50?1:0,passed=pct>=50,prev=p.levels[L.cat]||{};
+  const wasOpenNext=Q.level<5?isOpen(p,Q.level+1):false;const wasFinalOpen=isOpen(p,5);
+  p.levels[L.cat]={best:Math.max(prev.best||0,Q.score),stars:Math.max(prev.stars||0,stars),done:!!prev.done||passed};
+  p.points+=Q.score;save();
+  if(passed){grant('level');if(!Q.anyHint)grant('nohint');if(stars===3)grant('perfect');}
+  if(p.points>=1000)grant('crowns');
+  if(LEVELS.slice(0,5).every(x=>p.levels[x.cat]&&p.levels[x.cat].done))grant('gates');
+  renderHud();setDawn();
+  
+  // --- שליחת הנתונים לגוגל מתבצעת כאן ---
+  if (passed && GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== '') {
+    const dataToGoogle = {
+      name: p.name,
+      email: p.email || 'לא הוזן',
+      phone: p.phone || 'לא הוזן',
+      score: Q.score,
+      level: L.title
+    };
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dataToGoogle)
+    }).catch(err => console.error(err));
+  }
+  // --- סיום בלוק השליחה ---
+  
+  if(L.final&&passed){grant('champion');showCelebration();return}
+  const msg=pct>=90?'מדהים! אתם אלופי הגאולה!':pct>=70?'כל הכבוד! אתם בדרך להפוך למומחי גאולה!':pct>=50?'יפה מאוד! המשיכו ללמוד ולהתקדם!':'כל מסע מתחיל בלימוד — נסו שוב ותגלו עוד!';
+  let unlockMsg='';if(passed){if(Q.level<4&&!wasOpenNext)unlockMsg=`שער ${LEVELS[Q.level+1].gate}׳ נפתח: ${LEVELS[Q.level+1].title}`;else if(!wasFinalOpen&&isOpen(p,5))unlockMsg='השער האחרון נפתח: המסע הגדול!';}
+  const box=$('resultBox');
+  box.innerHTML=`<span class="pill">שער ${L.gate}׳ · ${L.title}</span><h2>${passed?'עברתם את השער!':'כמעט שם!'}</h2>${miniCrowns(stars,'big-crowns')}
+    <div class="score-num" id="scoreNum">0</div><p>${msg}</p>
+    <div class="stats"><div class="stat"><b>${Q.correct}/${Q.list.length}</b>תשובות נכונות</div><div class="stat"><b>${pct}%</b>הצלחה</div><div class="stat"><b>${Q.list.length}</b>שאלות</div></div>
+    ${unlockMsg?`<div class="banner">🔓 ${unlockMsg}</div>`:passed?'':'<div class="banner soft">עוברים שער עם חצי מהתשובות נכונות לפחות. רוצים לנסות שוב?</div>'}
+    <div class="row-btns"><button class="btn btn-gold" id="rMap" type="button">${unlockMsg?'לשער הבא ←':'חזרה למפה'}</button><button class="btn btn-line" id="rAgain" type="button">🔄 לשחק שוב בשער הזה</button></div>`;
+  show('s-result');
+  box.querySelectorAll('.big-crowns svg').forEach(s=>{s.classList.remove('on');s.style.color=gemOf(p)});
+  const crowns=[...box.querySelectorAll('.big-crowns svg')];
+  crowns.forEach((s,i)=>{if(i<stars)setTimeout(()=>{s.classList.add('on');SFX.star(i);burstFrom(s,10)},500+i*420)});
+  countUp($('scoreNum'),Q.score,900);
+  if(unlockMsg)setTimeout(SFX.unlock,500+stars*420+200);
+  $('rMap').onclick=()=>{SFX.tap();openMap()};$('rAgain').onclick=()=>{SFX.tap();startLevel(Q.level)};}
+function countUp(el,to,ms){if(rm){el.textContent=to.toLocaleString('he-IL');return}const t0=performance.now();
+  (function f(t){const k=Math.min(1,(t-t0)/ms);el.textContent=Math.round(to*(1-Math.pow(1-k,3))).toLocaleString('he-IL');if(k<1)requestAnimationFrame(f)})(t0);}
+
+/* ---- celebration ---- */
+function showCelebration(){const p=me();$('celebrate').hidden=false;$('celLede').textContent=`${p.name}, עברתם את כל שערי המסע. השמיים מעל ירושלים מוארים, ובית המקדש השלישי מתגלה באור מלא.`;
+  $('certName').textContent=p.name;$('certCrown').style.color=gemOf(p);
+  const best=LEVELS.reduce((s,L)=>s+((p.levels[L.cat]&&p.levels[L.cat].stars)||0),0);
+  $('certStats').innerHTML=`<div class="stat"><b>${p.points.toLocaleString('he-IL')}</b>נקודות</div><div class="stat"><b>${best}/18</b>כתרים</div><div class="stat"><b>${Object.keys(p.ach).length}/${ACH.length}</b>הישגים</div>`;
+  let hd='';try{hd=new Intl.DateTimeFormat('he-u-ca-hebrew',{day:'numeric',month:'long',year:'numeric'}).format(new Date())}catch(e){}
+  $('certDate').textContent=hd?`ניתן ביום ${hd}`:'';
+  $('celebrate').scrollTop=0;SFX.fanfare();
+  if(!rm){spawn(0,0,120,{rain:true,sparkle:.3});setTimeout(()=>spawn(0,0,80,{rain:true,sparkle:.35}),1600);
+    setTimeout(()=>{const r=$('certCrown').getBoundingClientRect();spawn(r.left+r.width/2,r.top,30)},900);}
+  setTimeout(()=>$('celMap').focus({preventScroll:true}),400);}
+$('celMap').onclick=()=>{SFX.tap();$('celebrate').hidden=true;openMap()};
+$('celAgain').onclick=()=>{SFX.tap();$('celebrate').hidden=true;startLevel(5)};
+
+/* ---- achievements ---- */
+let toastQ=[],toastBusy=false;
+function grant(id){const p=me();if(!p||p.ach[id])return;p.ach[id]=Date.now();save();renderHud();toastQ.push(ACH.find(a=>a.id===id));pumpToasts();}
+function pumpToasts(){if(toastBusy||!toastQ.length)return;toastBusy=true;const a=toastQ.shift(),p=me();const t=document.createElement('div');t.className='toast';
+  t.innerHTML=`<span class="medal"><svg style="color:${gemOf(p)}"><use href="#crown"/></svg></span><span><small>הישג חדש נפתח</small><b></b></span>`;t.querySelector('b').textContent=a.title;
+  $('toasts').appendChild(t);setTimeout(SFX.achieve,250);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>{t.remove();toastBusy=false;pumpToasts()},380)},2600);}
+function openAch(){const p=me();if(!p)return;const l=$('achList');l.innerHTML='';
+  ACH.forEach(a=>{const has=!!p.ach[a.id];const d=document.createElement('div');d.className='ach'+(has?'':' off');
+    d.innerHTML=`<span class="medal"><svg style="color:${gemOf(p)}"><use href="#crown"/></svg></span><span><b></b><small></small></span>`;
+    d.querySelector('b').textContent=a.title+(has?'':' 🔒');d.querySelector('small').textContent=a.desc;l.appendChild(d);});
+  $('achModal').hidden=false;SFX.tap();$('achClose').focus();}
+$('hudAch').onclick=openAch;$('achClose').onclick=()=>{$('achModal').hidden=true;$('hudAch').focus()};
+$('achModal').addEventListener('click',e=>{if(e.target===$('achModal')){$('achModal').hidden=true}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('achModal').hidden){$('achModal').hidden=true}});
+$('hudPlayer').onclick=()=>{SFX.tap();openProfiles()};
+$('sndBtn').onclick=toggleSound;$('sndBtn2').onclick=toggleSound;
+
+/* ---- boot ---- */
+function resize(){initSky();sizeCanvas(burst);if(rm)drawSky(0);drawPath();}
+window.addEventListener('resize',()=>{clearTimeout(resize.t);resize.t=setTimeout(resize,120)});
+load();setSoundIcon();resize();if(!rm)requestAnimationFrame(skyLoop);
+if(me())openMap();else openProfiles();
+})();
+</script>
+
+  <a href="https://api.whatsapp.com/send?text=היי!%20הכנתי%20חידון%20מגניב.%20בואו%20לנסות:%20https://yisraeljewishmusic-dotcom.github.io/Masa/" target="_blank" style="display: block; background-color: #25D366; color: white; text-align: center; padding: 15px; text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold; margin-top: 20px;">
+  שתף בוואטסאפ 💬
+  </a>
+</body>
+</html>
